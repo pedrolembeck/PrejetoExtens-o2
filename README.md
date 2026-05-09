@@ -455,7 +455,6 @@ As entidades devem conter:
 
 ## Doador e Receptor — Dacio
 
-Prazo: 15/05
 
 Implementar:
 
@@ -468,7 +467,6 @@ Implementar:
 
 ## Doação — Andrei
 
-Prazo: 15/05
 
 Implementar:
 
@@ -481,7 +479,6 @@ Implementar:
 
 ## Item — Alan
 
-Prazo: 15/05
 
 Implementar:
 
@@ -494,7 +491,6 @@ Implementar:
 
 ## Estoque — Felippe
 
-Prazo: 15/05
 
 Implementar:
 
@@ -507,7 +503,6 @@ Implementar:
 
 ## Distribuição — Pedro
 
-Prazo: 15/05
 
 Implementar:
 
