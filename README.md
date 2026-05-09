@@ -21,7 +21,7 @@ Este guia foi criado para orientar todos os integrantes da equipe sobre:
 
 # Tecnologias Utilizadas
 
-* Java 17+
+* Java 21
 * Maven
 * PostgreSQL
 * JDBC
