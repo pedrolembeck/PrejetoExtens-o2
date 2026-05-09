@@ -178,7 +178,7 @@ Isso significa que:
 
 Todos os integrantes precisam possuir:
 
-* Java JDK 17+
+* Java JDK 21
 * Maven
 * IntelliJ IDEA
 * Git
