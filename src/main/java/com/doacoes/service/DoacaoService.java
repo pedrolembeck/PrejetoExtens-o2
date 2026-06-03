@@ -9,9 +9,11 @@ import java.util.List;
 public class DoacaoService {
 
     private final DoacaoDAO dao = new DoacaoDAO();
+    private final EstoqueService estoqueService = new EstoqueService();
 
     public void inicializar() {
         dao.criarTabela();
+        estoqueService.inicializar();
     }
 
     public boolean salvar(Doacao doacao) {
@@ -20,6 +22,13 @@ public class DoacaoService {
         }
 
         dao.salvar(doacao);
+
+        estoqueService.adicionarOuCriarPorDoacao(
+                doacao.getDescricaoItem(),
+                doacao.getQuantidade(),
+                doacao.getCategoria()
+        );
+
         return true;
     }
 
