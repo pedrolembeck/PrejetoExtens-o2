@@ -9,6 +9,7 @@ public class Doacao {
     private String descricaoItem;
     private int quantidade;
     private String categoria;
+    private String tamanho;
     private LocalDate dataDoacao;
     private String observacao;
 
@@ -16,12 +17,13 @@ public class Doacao {
     }
 
     public Doacao(Long id, String nomeDoador, String descricaoItem, int quantidade,
-                  String categoria, LocalDate dataDoacao, String observacao) {
+                  String categoria, String tamanho, LocalDate dataDoacao, String observacao) {
         this.id = id;
         this.nomeDoador = nomeDoador;
         this.descricaoItem = descricaoItem;
         this.quantidade = quantidade;
         this.categoria = categoria;
+        this.tamanho = tamanho;
         this.dataDoacao = dataDoacao;
         this.observacao = observacao;
     }
@@ -64,6 +66,14 @@ public class Doacao {
 
     public void setCategoria(String categoria) {
         this.categoria = categoria;
+    }
+
+    public String getTamanho() {
+        return tamanho;
+    }
+
+    public void setTamanho(String tamanho) {
+        this.tamanho = tamanho;
     }
 
     public LocalDate getDataDoacao() {

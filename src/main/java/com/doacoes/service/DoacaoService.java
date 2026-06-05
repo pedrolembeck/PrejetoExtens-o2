@@ -24,7 +24,7 @@ public class DoacaoService {
         dao.salvar(doacao);
 
         estoqueService.adicionarOuCriarPorDoacao(
-                doacao.getDescricaoItem(),
+                montarDescricaoParaEstoque(doacao),
                 doacao.getQuantidade(),
                 doacao.getCategoria()
         );
@@ -53,6 +53,16 @@ public class DoacaoService {
         dao.deletar(id);
     }
 
+    private String montarDescricaoParaEstoque(Doacao doacao) {
+        if ("VESTUARIO".equals(doacao.getCategoria())
+                && doacao.getTamanho() != null
+                && !doacao.getTamanho().isBlank()) {
+            return doacao.getDescricaoItem() + " - TAM " + doacao.getTamanho();
+        }
+
+        return doacao.getDescricaoItem();
+    }
+
     private boolean validar(Doacao doacao) {
         if (doacao.getNomeDoador() == null || doacao.getNomeDoador().isBlank()) {
             JOptionPane.showMessageDialog(null, "Nome do doador é obrigatório!");
@@ -74,6 +84,12 @@ public class DoacaoService {
             return false;
         }
 
+        if ("VESTUARIO".equals(doacao.getCategoria())
+                && (doacao.getTamanho() == null || doacao.getTamanho().isBlank())) {
+            JOptionPane.showMessageDialog(null, "Tamanho é obrigatório para vestuário!");
+            return false;
+        }
+
         if (doacao.getDataDoacao() == null) {
             JOptionPane.showMessageDialog(null, "Data da doação é obrigatória!");
             return false;
@@ -81,4 +97,19 @@ public class DoacaoService {
 
         return true;
     }
+    public List<Doacao> listarPorDoador(String nomeDoador) {
+        if (nomeDoador == null || nomeDoador.isBlank()) {
+            return listar();
+        }
+
+        return dao.listarPorDoador(nomeDoador.trim());
+    }
+    public List<Doacao> pesquisar(String termo) {
+        if (termo == null || termo.isBlank()) {
+            return listar();
+        }
+
+        return dao.pesquisar(termo.trim());
+    }
+
 }

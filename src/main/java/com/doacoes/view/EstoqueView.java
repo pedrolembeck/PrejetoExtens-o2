@@ -76,7 +76,7 @@ public class EstoqueView extends JFrame {
         JButton btnAdicionar = criarBotao("+ Entrada", new Color(142, 68, 173));
         JButton btnRemover = criarBotao("- Saída", new Color(211, 84, 0));
         JButton btnAtualizar = criarBotao("Atualizar", new Color(127, 140, 141));
-        JButton btnDoacao = criarBotao("Doação", new Color(52, 73, 94));
+
 
         btnCadastrar.addActionListener(e -> abrirFormCadastro());
         btnEditar.addActionListener(e -> abrirFormEdicao());
@@ -85,10 +85,7 @@ public class EstoqueView extends JFrame {
         btnRemover.addActionListener(e -> movimentarEstoque(false));
         btnAtualizar.addActionListener(e -> carregarTabela());
 
-        btnDoacao.addActionListener(e -> {
-            DoacaoView tela = new DoacaoView();
-            tela.setVisible(true);
-        });
+
 
         painelBotoes.add(btnCadastrar);
         painelBotoes.add(btnEditar);
@@ -96,7 +93,7 @@ public class EstoqueView extends JFrame {
         painelBotoes.add(btnAdicionar);
         painelBotoes.add(btnRemover);
         painelBotoes.add(btnAtualizar);
-        painelBotoes.add(btnDoacao);
+
 
         add(painelBotoes, BorderLayout.SOUTH);
     }
