@@ -19,7 +19,7 @@ public class MenuView extends JFrame {
 
     private void configurarJanela() {
         setTitle("Sistema de Doações - Menu Principal");
-        setSize(600, 520);
+        setSize(650, 620);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout(0, 0));
@@ -47,7 +47,7 @@ public class MenuView extends JFrame {
 
         add(cabecalho, BorderLayout.NORTH);
 
-        JPanel painelModulos = new JPanel(new GridLayout(3, 2, 15, 15));
+        JPanel painelModulos = new JPanel(new GridLayout(4, 2, 15, 15));
         painelModulos.setBackground(new Color(236, 240, 241));
         painelModulos.setBorder(new EmptyBorder(25, 30, 15, 30));
 
@@ -56,6 +56,20 @@ public class MenuView extends JFrame {
                 "Cadastrar e gerenciar tipos",
                 new Color(41, 128, 185),
                 e -> abrirTipoDoacao()
+        ));
+
+        painelModulos.add(criarBotaoModulo(
+                "Usuários",
+                "Gerenciar acessos ao sistema",
+                new Color(44, 62, 80),
+                e -> abrirUsuarios()
+        ));
+
+        painelModulos.add(criarBotaoModulo(
+                "Tamanhos",
+                "Cadastrar tamanhos de roupas",
+                new Color(52, 73, 94),
+                e -> abrirTamanhos()
         ));
 
         painelModulos.add(criarBotaoModulo(
@@ -156,6 +170,11 @@ public class MenuView extends JFrame {
         setVisible(true);
     }
 
+    private void abrirUsuarios() {
+        UsuarioView usuarioView = new UsuarioView();
+        usuarioView.setVisible(true);
+    }
+
     private void abrirEstoque() {
         EstoqueView estoqueView = new EstoqueView();
         estoqueView.setVisible(true);
@@ -164,6 +183,11 @@ public class MenuView extends JFrame {
     private void abrirDoacao() {
         DoacaoView doacaoView = new DoacaoView();
         doacaoView.setVisible(true);
+    }
+
+    private void abrirTamanhos() {
+        TamanhoRoupaView tamanhoRoupaView = new TamanhoRoupaView();
+        tamanhoRoupaView.setVisible(true);
     }
 
     private void abrirTipoDoacao() {

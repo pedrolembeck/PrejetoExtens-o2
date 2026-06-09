@@ -1,7 +1,6 @@
 package com.doacoes;
 
-import com.doacoes.view.EstoqueView;
-import com.doacoes.view.MenuView;
+import com.doacoes.view.LoginView;
 
 import javax.swing.SwingUtilities;
 
@@ -9,8 +8,8 @@ public class App {
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
-            MenuView tela = new MenuView();
-            tela.setVisible(true);
+            LoginView loginView = new LoginView();
+            loginView.setVisible(true);
         });
     }
 }

@@ -53,11 +53,36 @@ public class DoacaoService {
         dao.deletar(id);
     }
 
+    public List<Doacao> pesquisar(String termo) {
+        if (termo == null || termo.isBlank()) {
+            return listar();
+        }
+
+        return dao.pesquisar(termo.trim());
+    }
+
     private String montarDescricaoParaEstoque(Doacao doacao) {
         if ("VESTUARIO".equals(doacao.getCategoria())
                 && doacao.getTamanho() != null
                 && !doacao.getTamanho().isBlank()) {
             return doacao.getDescricaoItem() + " - TAM " + doacao.getTamanho();
+        }
+
+        if ("ALIMENTOS".equals(doacao.getCategoria())) {
+            String descricao = doacao.getDescricaoItem();
+
+            if (doacao.getUnidade() != null
+                    && !doacao.getUnidade().isBlank()
+                    && !"UNIDADE".equals(doacao.getUnidade())) {
+                descricao += " - " + doacao.getUnidade();
+            }
+
+            if (doacao.getDetalheUnidade() != null
+                    && !doacao.getDetalheUnidade().isBlank()) {
+                descricao += " " + doacao.getDetalheUnidade();
+            }
+
+            return descricao;
         }
 
         return doacao.getDescricaoItem();
@@ -84,6 +109,11 @@ public class DoacaoService {
             return false;
         }
 
+        if (doacao.getUnidade() == null || doacao.getUnidade().isBlank()) {
+            JOptionPane.showMessageDialog(null, "Unidade é obrigatória!");
+            return false;
+        }
+
         if ("VESTUARIO".equals(doacao.getCategoria())
                 && (doacao.getTamanho() == null || doacao.getTamanho().isBlank())) {
             JOptionPane.showMessageDialog(null, "Tamanho é obrigatório para vestuário!");
@@ -97,19 +127,4 @@ public class DoacaoService {
 
         return true;
     }
-    public List<Doacao> listarPorDoador(String nomeDoador) {
-        if (nomeDoador == null || nomeDoador.isBlank()) {
-            return listar();
-        }
-
-        return dao.listarPorDoador(nomeDoador.trim());
-    }
-    public List<Doacao> pesquisar(String termo) {
-        if (termo == null || termo.isBlank()) {
-            return listar();
-        }
-
-        return dao.pesquisar(termo.trim());
-    }
-
 }

@@ -17,7 +17,9 @@ public class DoacaoDAO {
                     descricao_item VARCHAR(200) NOT NULL,
                     quantidade INT NOT NULL,
                     categoria VARCHAR(100) NOT NULL,
-                    tamanho VARCHAR(20),
+                    tamanho VARCHAR(50),
+                    unidade VARCHAR(30) DEFAULT 'UNIDADE',
+                    detalhe_unidade VARCHAR(50),
                     data_doacao DATE NOT NULL,
                     observacao VARCHAR(300)
                 )
@@ -25,16 +27,31 @@ public class DoacaoDAO {
 
         String sqlAlterTamanho = """
                 ALTER TABLE doacao
-                ADD COLUMN IF NOT EXISTS tamanho VARCHAR(20)
+                ADD COLUMN IF NOT EXISTS tamanho VARCHAR(50)
                 """;
 
-        try (
-                Connection connection = ConnectionFactory.getConnection();
-                PreparedStatement statement = connection.prepareStatement(sql);
-                PreparedStatement statementAlter = connection.prepareStatement(sqlAlterTamanho)
-        ) {
-            statement.executeUpdate();
-            statementAlter.executeUpdate();
+        String sqlAlterUnidade = """
+                ALTER TABLE doacao
+                ADD COLUMN IF NOT EXISTS unidade VARCHAR(30) DEFAULT 'UNIDADE'
+                """;
+
+        String sqlAlterDetalheUnidade = """
+                ALTER TABLE doacao
+                ADD COLUMN IF NOT EXISTS detalhe_unidade VARCHAR(50)
+                """;
+
+        String sqlAumentarTamanho = """
+                ALTER TABLE doacao
+                ALTER COLUMN tamanho TYPE VARCHAR(50)
+                """;
+
+        try (Connection connection = ConnectionFactory.getConnection()) {
+            connection.prepareStatement(sql).executeUpdate();
+            connection.prepareStatement(sqlAlterTamanho).executeUpdate();
+            connection.prepareStatement(sqlAlterUnidade).executeUpdate();
+            connection.prepareStatement(sqlAlterDetalheUnidade).executeUpdate();
+            connection.prepareStatement(sqlAumentarTamanho).executeUpdate();
+
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -42,8 +59,18 @@ public class DoacaoDAO {
 
     public void salvar(Doacao doacao) {
         String sql = """
-                INSERT INTO doacao(nome_doador, descricao_item, quantidade, categoria, tamanho, data_doacao, observacao)
-                VALUES (?, ?, ?, ?, ?, ?, ?)
+                INSERT INTO doacao(
+                    nome_doador,
+                    descricao_item,
+                    quantidade,
+                    categoria,
+                    tamanho,
+                    unidade,
+                    detalhe_unidade,
+                    data_doacao,
+                    observacao
+                )
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """;
 
         try (
@@ -55,10 +82,13 @@ public class DoacaoDAO {
             statement.setInt(3, doacao.getQuantidade());
             statement.setString(4, doacao.getCategoria());
             statement.setString(5, doacao.getTamanho());
-            statement.setDate(6, Date.valueOf(doacao.getDataDoacao()));
-            statement.setString(7, doacao.getObservacao());
+            statement.setString(6, doacao.getUnidade());
+            statement.setString(7, doacao.getDetalheUnidade());
+            statement.setDate(8, Date.valueOf(doacao.getDataDoacao()));
+            statement.setString(9, doacao.getObservacao());
 
             statement.executeUpdate();
+
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -77,6 +107,7 @@ public class DoacaoDAO {
             while (resultSet.next()) {
                 lista.add(mapearDoacao(resultSet));
             }
+
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -98,6 +129,7 @@ public class DoacaoDAO {
             if (resultSet.next()) {
                 return mapearDoacao(resultSet);
             }
+
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -108,7 +140,15 @@ public class DoacaoDAO {
     public void atualizar(Doacao doacao) {
         String sql = """
                 UPDATE doacao
-                SET nome_doador = ?, descricao_item = ?, quantidade = ?, categoria = ?, tamanho = ?, data_doacao = ?, observacao = ?
+                SET nome_doador = ?,
+                    descricao_item = ?,
+                    quantidade = ?,
+                    categoria = ?,
+                    tamanho = ?,
+                    unidade = ?,
+                    detalhe_unidade = ?,
+                    data_doacao = ?,
+                    observacao = ?
                 WHERE id = ?
                 """;
 
@@ -121,11 +161,14 @@ public class DoacaoDAO {
             statement.setInt(3, doacao.getQuantidade());
             statement.setString(4, doacao.getCategoria());
             statement.setString(5, doacao.getTamanho());
-            statement.setDate(6, Date.valueOf(doacao.getDataDoacao()));
-            statement.setString(7, doacao.getObservacao());
-            statement.setLong(8, doacao.getId());
+            statement.setString(6, doacao.getUnidade());
+            statement.setString(7, doacao.getDetalheUnidade());
+            statement.setDate(8, Date.valueOf(doacao.getDataDoacao()));
+            statement.setString(9, doacao.getObservacao());
+            statement.setLong(10, doacao.getId());
 
             statement.executeUpdate();
+
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -140,63 +183,25 @@ public class DoacaoDAO {
         ) {
             statement.setLong(1, id);
             statement.executeUpdate();
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    private Doacao mapearDoacao(ResultSet resultSet) throws SQLException {
-        Doacao doacao = new Doacao();
-
-        doacao.setId(resultSet.getLong("id"));
-        doacao.setNomeDoador(resultSet.getString("nome_doador"));
-        doacao.setDescricaoItem(resultSet.getString("descricao_item"));
-        doacao.setQuantidade(resultSet.getInt("quantidade"));
-        doacao.setCategoria(resultSet.getString("categoria"));
-        doacao.setTamanho(resultSet.getString("tamanho"));
-        doacao.setDataDoacao(resultSet.getDate("data_doacao").toLocalDate());
-        doacao.setObservacao(resultSet.getString("observacao"));
-
-        return doacao;
-    }
-    public List<Doacao> listarPorDoador(String nomeDoador) {
-        List<Doacao> lista = new ArrayList<>();
-
-        String sql = """
-            SELECT * FROM doacao
-            WHERE UPPER(nome_doador) LIKE UPPER(?)
-            ORDER BY id
-            """;
-
-        try (
-                Connection connection = ConnectionFactory.getConnection();
-                PreparedStatement statement = connection.prepareStatement(sql)
-        ) {
-            statement.setString(1, "%" + nomeDoador + "%");
-
-            try (ResultSet resultSet = statement.executeQuery()) {
-                while (resultSet.next()) {
-                    lista.add(mapearDoacao(resultSet));
-                }
-            }
 
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
-
-        return lista;
     }
+
     public List<Doacao> pesquisar(String termo) {
         List<Doacao> lista = new ArrayList<>();
 
         String sql = """
-            SELECT * FROM doacao
-            WHERE UPPER(nome_doador) LIKE UPPER(?)
-               OR UPPER(descricao_item) LIKE UPPER(?)
-               OR UPPER(categoria) LIKE UPPER(?)
-               OR UPPER(COALESCE(tamanho, '')) LIKE UPPER(?)
-            ORDER BY id
-            """;
+                SELECT * FROM doacao
+                WHERE UPPER(nome_doador) LIKE UPPER(?)
+                   OR UPPER(descricao_item) LIKE UPPER(?)
+                   OR UPPER(categoria) LIKE UPPER(?)
+                   OR UPPER(COALESCE(tamanho, '')) LIKE UPPER(?)
+                   OR UPPER(COALESCE(unidade, '')) LIKE UPPER(?)
+                   OR UPPER(COALESCE(detalhe_unidade, '')) LIKE UPPER(?)
+                ORDER BY id
+                """;
 
         try (
                 Connection connection = ConnectionFactory.getConnection();
@@ -208,6 +213,8 @@ public class DoacaoDAO {
             statement.setString(2, termoPesquisa);
             statement.setString(3, termoPesquisa);
             statement.setString(4, termoPesquisa);
+            statement.setString(5, termoPesquisa);
+            statement.setString(6, termoPesquisa);
 
             try (ResultSet resultSet = statement.executeQuery()) {
                 while (resultSet.next()) {
@@ -222,4 +229,20 @@ public class DoacaoDAO {
         return lista;
     }
 
+    private Doacao mapearDoacao(ResultSet resultSet) throws SQLException {
+        Doacao doacao = new Doacao();
+
+        doacao.setId(resultSet.getLong("id"));
+        doacao.setNomeDoador(resultSet.getString("nome_doador"));
+        doacao.setDescricaoItem(resultSet.getString("descricao_item"));
+        doacao.setQuantidade(resultSet.getInt("quantidade"));
+        doacao.setCategoria(resultSet.getString("categoria"));
+        doacao.setTamanho(resultSet.getString("tamanho"));
+        doacao.setUnidade(resultSet.getString("unidade"));
+        doacao.setDetalheUnidade(resultSet.getString("detalhe_unidade"));
+        doacao.setDataDoacao(resultSet.getDate("data_doacao").toLocalDate());
+        doacao.setObservacao(resultSet.getString("observacao"));
+
+        return doacao;
+    }
 }

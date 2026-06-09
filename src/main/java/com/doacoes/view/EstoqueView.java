@@ -7,6 +7,12 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 public class EstoqueView extends JFrame {
@@ -76,7 +82,7 @@ public class EstoqueView extends JFrame {
         JButton btnAdicionar = criarBotao("+ Entrada", new Color(142, 68, 173));
         JButton btnRemover = criarBotao("- Saída", new Color(211, 84, 0));
         JButton btnAtualizar = criarBotao("Atualizar", new Color(127, 140, 141));
-
+        JButton btnRelatorio = criarBotao("Relatório CSV", new Color(52, 73, 94));
 
         btnCadastrar.addActionListener(e -> abrirFormCadastro());
         btnEditar.addActionListener(e -> abrirFormEdicao());
@@ -84,8 +90,7 @@ public class EstoqueView extends JFrame {
         btnAdicionar.addActionListener(e -> movimentarEstoque(true));
         btnRemover.addActionListener(e -> movimentarEstoque(false));
         btnAtualizar.addActionListener(e -> carregarTabela());
-
-
+        btnRelatorio.addActionListener(e -> exportarRelatorioCSV());
 
         painelBotoes.add(btnCadastrar);
         painelBotoes.add(btnEditar);
@@ -93,7 +98,7 @@ public class EstoqueView extends JFrame {
         painelBotoes.add(btnAdicionar);
         painelBotoes.add(btnRemover);
         painelBotoes.add(btnAtualizar);
-
+        painelBotoes.add(btnRelatorio);
 
         add(painelBotoes, BorderLayout.SOUTH);
     }
@@ -329,5 +334,74 @@ public class EstoqueView extends JFrame {
         }
 
         return form;
+    }
+
+    private void exportarRelatorioCSV() {
+        if (modeloTabela.getRowCount() == 0) {
+            JOptionPane.showMessageDialog(this, "Não há dados para exportar.");
+            return;
+        }
+
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setDialogTitle("Salvar relatório de estoque");
+        fileChooser.setSelectedFile(new File("relatorio_estoque.csv"));
+
+        int opcao = fileChooser.showSaveDialog(this);
+
+        if (opcao != JFileChooser.APPROVE_OPTION) {
+            return;
+        }
+
+        File arquivo = fileChooser.getSelectedFile();
+
+        if (!arquivo.getName().toLowerCase().endsWith(".csv")) {
+            arquivo = new File(arquivo.getAbsolutePath() + ".csv");
+        }
+
+        try (
+                BufferedWriter writer = new BufferedWriter(
+                        new OutputStreamWriter(new FileOutputStream(arquivo), StandardCharsets.UTF_8)
+                )
+        ) {
+            for (int coluna = 0; coluna < modeloTabela.getColumnCount(); coluna++) {
+                writer.write(modeloTabela.getColumnName(coluna));
+
+                if (coluna < modeloTabela.getColumnCount() - 1) {
+                    writer.write(";");
+                }
+            }
+
+            writer.newLine();
+
+            for (int linha = 0; linha < modeloTabela.getRowCount(); linha++) {
+                for (int coluna = 0; coluna < modeloTabela.getColumnCount(); coluna++) {
+                    Object valor = modeloTabela.getValueAt(linha, coluna);
+
+                    String texto = valor == null ? "" : valor.toString();
+                    texto = texto.replace(";", ",")
+                            .replace("\n", " ")
+                            .replace("\r", " ");
+
+                    writer.write(texto);
+
+                    if (coluna < modeloTabela.getColumnCount() - 1) {
+                        writer.write(";");
+                    }
+                }
+
+                writer.newLine();
+            }
+
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Relatório de estoque gerado com sucesso:\n" + arquivo.getAbsolutePath()
+            );
+
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Erro ao gerar relatório de estoque:\n" + e.getMessage()
+            );
+        }
     }
 }
