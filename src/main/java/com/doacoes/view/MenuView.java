@@ -1,16 +1,11 @@
 package com.doacoes.view;
 
-import com.doacoes.enums.CategoriaItem;
-import com.doacoes.model.TipoDoacao;
-import com.doacoes.service.TipoDoacaoService;
-
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
+import java.awt.geom.RoundRectangle2D;
 
 public class MenuView extends JFrame {
-
-    private final TipoDoacaoService tipoService = new TipoDoacaoService();
 
     public MenuView() {
         configurarJanela();
@@ -18,152 +13,236 @@ public class MenuView extends JFrame {
     }
 
     private void configurarJanela() {
-        setTitle("Sistema de Doações - Menu Principal");
-        setSize(650, 620);
+        setTitle("Solidário - Menu Principal");
+        setSize(920, 640);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setLayout(new BorderLayout(0, 0));
-        getContentPane().setBackground(new Color(236, 240, 241));
+        setResizable(false);
     }
 
     private void construirInterface() {
+        JPanel fundo = new JPanel(new BorderLayout());
+        fundo.setBackground(new Color(241, 245, 249));
+        setContentPane(fundo);
 
+        fundo.add(criarCabecalho(), BorderLayout.NORTH);
+        fundo.add(criarPainelCentral(), BorderLayout.CENTER);
+        fundo.add(criarRodape(), BorderLayout.SOUTH);
+    }
+
+    private JPanel criarCabecalho() {
         JPanel cabecalho = new JPanel(new BorderLayout());
-        cabecalho.setBackground(new Color(23, 32, 42));
-        cabecalho.setBorder(new EmptyBorder(20, 30, 20, 30));
+        cabecalho.setBackground(new Color(22, 160, 133));
+        cabecalho.setBorder(new EmptyBorder(28, 45, 28, 45));
 
-        JLabel lblTitulo = new JLabel("Sistema de Gerenciamento de Doações");
-        lblTitulo.setFont(new Font("Arial", Font.BOLD, 22));
-        lblTitulo.setForeground(Color.WHITE);
-        lblTitulo.setHorizontalAlignment(SwingConstants.CENTER);
+        JPanel textos = new JPanel();
+        textos.setOpaque(false);
+        textos.setLayout(new BoxLayout(textos, BoxLayout.Y_AXIS));
 
-        JLabel lblSubtitulo = new JLabel("Selecione um módulo para continuar");
-        lblSubtitulo.setFont(new Font("Arial", Font.PLAIN, 13));
-        lblSubtitulo.setForeground(new Color(149, 165, 166));
-        lblSubtitulo.setHorizontalAlignment(SwingConstants.CENTER);
+        JLabel titulo = new JLabel("SOLIDÁRIO");
+        titulo.setFont(new Font("Arial", Font.BOLD, 34));
+        titulo.setForeground(Color.WHITE);
 
-        cabecalho.add(lblTitulo, BorderLayout.CENTER);
-        cabecalho.add(lblSubtitulo, BorderLayout.SOUTH);
+        JLabel subtitulo = new JLabel("Sistema de Gerenciamento de Doações");
+        subtitulo.setFont(new Font("Arial", Font.PLAIN, 15));
+        subtitulo.setForeground(new Color(235, 245, 245));
 
-        add(cabecalho, BorderLayout.NORTH);
+        textos.add(titulo);
+        textos.add(Box.createVerticalStrut(4));
+        textos.add(subtitulo);
 
-        JPanel painelModulos = new JPanel(new GridLayout(4, 2, 15, 15));
-        painelModulos.setBackground(new Color(236, 240, 241));
-        painelModulos.setBorder(new EmptyBorder(25, 30, 15, 30));
+        JLabel usuario = new JLabel("Menu Principal");
+        usuario.setFont(new Font("Arial", Font.BOLD, 15));
+        usuario.setForeground(Color.WHITE);
+        usuario.setHorizontalAlignment(SwingConstants.RIGHT);
 
-        painelModulos.add(criarBotaoModulo(
+        cabecalho.add(textos, BorderLayout.WEST);
+        cabecalho.add(usuario, BorderLayout.EAST);
+
+        return cabecalho;
+    }
+
+    private JPanel criarPainelCentral() {
+        JPanel painel = new JPanel(new BorderLayout());
+        painel.setBackground(new Color(241, 245, 249));
+        painel.setBorder(new EmptyBorder(28, 45, 20, 45));
+
+        JLabel instrucao = new JLabel("Selecione um módulo para continuar");
+        instrucao.setFont(new Font("Arial", Font.BOLD, 18));
+        instrucao.setForeground(new Color(44, 62, 80));
+
+        JLabel descricao = new JLabel("Acesse as funcionalidades do sistema de forma rápida e organizada.");
+        descricao.setFont(new Font("Arial", Font.PLAIN, 13));
+        descricao.setForeground(new Color(100, 116, 139));
+
+        JPanel painelTexto = new JPanel();
+        painelTexto.setOpaque(false);
+        painelTexto.setLayout(new BoxLayout(painelTexto, BoxLayout.Y_AXIS));
+        painelTexto.add(instrucao);
+        painelTexto.add(Box.createVerticalStrut(5));
+        painelTexto.add(descricao);
+
+        painel.add(painelTexto, BorderLayout.NORTH);
+
+        JPanel painelCards = new JPanel(new GridLayout(4, 2, 18, 18));
+        painelCards.setOpaque(false);
+        painelCards.setBorder(new EmptyBorder(25, 0, 0, 0));
+
+        painelCards.add(criarCardModulo(
                 "Tipo de Doação",
-                "Cadastrar e gerenciar tipos",
+                "Cadastrar e organizar tipos de itens",
                 new Color(41, 128, 185),
                 e -> abrirTipoDoacao()
         ));
 
-        painelModulos.add(criarBotaoModulo(
+        painelCards.add(criarCardModulo(
                 "Usuários",
                 "Gerenciar acessos ao sistema",
-                new Color(44, 62, 80),
+                new Color(52, 73, 94),
                 e -> abrirUsuarios()
         ));
 
-        painelModulos.add(criarBotaoModulo(
+        painelCards.add(criarCardModulo(
                 "Tamanhos",
                 "Cadastrar tamanhos de roupas",
-                new Color(52, 73, 94),
+                new Color(108, 92, 231),
                 e -> abrirTamanhos()
         ));
 
-        painelModulos.add(criarBotaoModulo(
+        painelCards.add(criarCardModulo(
                 "Estoque",
-                "Controlar itens em estoque",
+                "Acompanhar itens disponíveis",
                 new Color(39, 174, 96),
                 e -> abrirEstoque()
         ));
 
-        painelModulos.add(criarBotaoModulo(
+        painelCards.add(criarCardModulo(
                 "Doador",
-                "Gerenciar doadores",
+                "Gerenciar pessoas que realizam doações",
                 new Color(142, 68, 173),
                 e -> JOptionPane.showMessageDialog(this, "Módulo Doador\n(Em desenvolvimento - Dacio)")
         ));
 
-        painelModulos.add(criarBotaoModulo(
+        painelCards.add(criarCardModulo(
                 "Receptor",
-                "Gerenciar receptores",
-                new Color(211, 84, 0),
+                "Gerenciar pessoas que recebem doações",
+                new Color(230, 126, 34),
                 e -> JOptionPane.showMessageDialog(this, "Módulo Receptor\n(Em desenvolvimento - Dacio)")
         ));
 
-        painelModulos.add(criarBotaoModulo(
+        painelCards.add(criarCardModulo(
                 "Doação",
-                "Registrar doações",
+                "Registrar novas doações recebidas",
                 new Color(22, 160, 133),
                 e -> abrirDoacao()
         ));
 
-        painelModulos.add(criarBotaoModulo(
+        painelCards.add(criarCardModulo(
                 "Distribuição",
-                "Gerenciar distribuições",
+                "Controlar a entrega das doações",
                 new Color(192, 57, 43),
                 e -> JOptionPane.showMessageDialog(this, "Módulo Distribuição\n(Em desenvolvimento - Pedro)")
         ));
 
-        add(painelModulos, BorderLayout.CENTER);
+        painel.add(painelCards, BorderLayout.CENTER);
 
-        JPanel rodape = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        rodape.setBackground(new Color(189, 195, 199));
-        rodape.setBorder(new EmptyBorder(8, 15, 8, 15));
+        return painel;
+    }
+
+    private JButton criarCardModulo(String titulo, String subtitulo, Color cor,
+                                    java.awt.event.ActionListener acao) {
+
+        JButton btn = new JButton() {
+            @Override
+            protected void paintComponent(Graphics g) {
+                Graphics2D g2 = (Graphics2D) g.create();
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+                Color corFundo = cor;
+
+                if (getModel().isPressed()) {
+                    corFundo = cor.darker();
+                } else if (getModel().isRollover()) {
+                    corFundo = cor.brighter();
+                }
+
+                g2.setColor(corFundo);
+                g2.fillRoundRect(0, 0, getWidth(), getHeight(), 18, 18);
+
+                g2.setColor(new Color(255, 255, 255, 35));
+                g2.fillOval(getWidth() - 70, -25, 110, 110);
+
+                g2.dispose();
+
+                super.paintComponent(g);
+            }
+        };
+
+        btn.setLayout(new BorderLayout());
+        btn.setContentAreaFilled(false);
+        btn.setBorderPainted(false);
+        btn.setFocusPainted(false);
+        btn.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        btn.setBorder(new EmptyBorder(18, 22, 18, 22));
+
+        JLabel lblTitulo = new JLabel(titulo);
+        lblTitulo.setFont(new Font("Arial", Font.BOLD, 19));
+        lblTitulo.setForeground(Color.WHITE);
+
+        JLabel lblSubtitulo = new JLabel("<html>" + subtitulo + "</html>");
+        lblSubtitulo.setFont(new Font("Arial", Font.PLAIN, 13));
+        lblSubtitulo.setForeground(new Color(255, 255, 255, 220));
+
+        JPanel textos = new JPanel();
+        textos.setOpaque(false);
+        textos.setLayout(new BoxLayout(textos, BoxLayout.Y_AXIS));
+        textos.add(lblTitulo);
+        textos.add(Box.createVerticalStrut(8));
+        textos.add(lblSubtitulo);
+
+        btn.add(textos, BorderLayout.CENTER);
+        btn.addActionListener(acao);
+
+        return btn;
+    }
+
+    private JPanel criarRodape() {
+        JPanel rodape = new JPanel(new BorderLayout());
+        rodape.setBackground(Color.WHITE);
+        rodape.setBorder(new EmptyBorder(14, 45, 14, 45));
+
+        JLabel info = new JLabel("Solidário • Gestão de doações, estoque e distribuição");
+        info.setFont(new Font("Arial", Font.PLAIN, 12));
+        info.setForeground(new Color(100, 116, 139));
 
         JButton btnSair = new JButton("Sair do Sistema");
-        btnSair.setFont(new Font("Arial", Font.BOLD, 12));
-        btnSair.setBackground(new Color(127, 140, 141));
+        btnSair.setFont(new Font("Arial", Font.BOLD, 13));
+        btnSair.setBackground(new Color(231, 76, 60));
         btnSair.setForeground(Color.WHITE);
         btnSair.setFocusPainted(false);
         btnSair.setBorderPainted(false);
         btnSair.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        btnSair.setPreferredSize(new Dimension(160, 36));
 
         btnSair.addActionListener(e -> {
             int op = JOptionPane.showConfirmDialog(
                     this,
-                    "Deseja sair do sistema?",
+                    "Deseja sair do sistema e voltar para a tela de login?",
                     "Sair",
                     JOptionPane.YES_NO_OPTION
             );
 
             if (op == JOptionPane.YES_OPTION) {
-                System.exit(0);
+                LoginView loginView = new LoginView();
+                loginView.setVisible(true);
+                dispose();
             }
         });
 
-        rodape.add(btnSair);
+        rodape.add(info, BorderLayout.WEST);
+        rodape.add(btnSair, BorderLayout.EAST);
 
-        add(rodape, BorderLayout.SOUTH);
-    }
-
-    private JButton criarBotaoModulo(String titulo, String subtitulo, Color cor,
-                                     java.awt.event.ActionListener acao) {
-
-        JButton btn = new JButton();
-        btn.setLayout(new BorderLayout());
-        btn.setBackground(cor);
-        btn.setFocusPainted(false);
-        btn.setBorderPainted(false);
-        btn.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-
-        JLabel lblTitulo = new JLabel(titulo, SwingConstants.CENTER);
-        lblTitulo.setFont(new Font("Arial", Font.BOLD, 15));
-        lblTitulo.setForeground(Color.WHITE);
-        lblTitulo.setBorder(new EmptyBorder(10, 5, 0, 5));
-
-        JLabel lblSub = new JLabel(subtitulo, SwingConstants.CENTER);
-        lblSub.setFont(new Font("Arial", Font.PLAIN, 11));
-        lblSub.setForeground(new Color(255, 255, 255, 200));
-        lblSub.setBorder(new EmptyBorder(0, 5, 10, 5));
-
-        btn.add(lblTitulo, BorderLayout.CENTER);
-        btn.add(lblSub, BorderLayout.SOUTH);
-        btn.addActionListener(acao);
-
-        return btn;
+        return rodape;
     }
 
     public void iniciar() {
@@ -202,167 +281,6 @@ public class MenuView extends JFrame {
                     JOptionPane.ERROR_MESSAGE
             );
             ex.printStackTrace();
-        }
-    }
-
-    private void menuTipoDoacao() {
-
-        int opcao;
-
-        do {
-            opcao = Integer.parseInt(
-                    JOptionPane.showInputDialog("""
-
-                            ===== TIPO DOAÇÃO =====
-
-                            1 - Cadastrar
-                            2 - Listar
-                            3 - Atualizar
-                            4 - Deletar
-                            0 - Voltar
-                            """)
-            );
-
-            switch (opcao) {
-                case 1 -> cadastrarTipo();
-                case 2 -> listarTipos();
-                case 3 -> atualizarTipo();
-                case 4 -> deletarTipo();
-                case 0 -> {
-                }
-                default -> JOptionPane.showMessageDialog(null, "Opção inválida");
-            }
-
-        } while (opcao != 0);
-    }
-
-    private void cadastrarTipo() {
-
-        String nome = JOptionPane.showInputDialog("Nome:").toUpperCase();
-
-        int opcaoCategoria = Integer.parseInt(
-                JOptionPane.showInputDialog("""
-
-                    Selecione a categoria:
-
-                    1 - VESTUARIO
-                    2 - ALIMENTOS
-                    """)
-        );
-
-        CategoriaItem categoria;
-
-        switch (opcaoCategoria) {
-            case 1 -> categoria = CategoriaItem.VESTUARIO;
-            case 2 -> categoria = CategoriaItem.ALIMENTOS;
-            default -> {
-                JOptionPane.showMessageDialog(null, "Categoria inválida");
-                return;
-            }
-        }
-
-        TipoDoacao tipo = new TipoDoacao();
-        tipo.setNome(nome);
-        tipo.setCategoria(categoria);
-
-        boolean salvou = tipoService.salvar(tipo);
-
-        if (salvou) {
-            JOptionPane.showMessageDialog(null, "Cadastrado com sucesso");
-        } else {
-            JOptionPane.showMessageDialog(null, "Erro ao cadastrar");
-        }
-    }
-
-    private void listarTipos() {
-
-        StringBuilder sb = new StringBuilder();
-
-        tipoService.listar().forEach(item ->
-                sb.append(item).append("\n")
-        );
-
-        JOptionPane.showMessageDialog(null, sb.toString());
-    }
-
-    private void atualizarTipo() {
-
-        Long id = Long.parseLong(
-                JOptionPane.showInputDialog("Digite o ID:")
-        );
-
-        TipoDoacao tipo = tipoService.buscarPorId(id);
-
-        if (tipo == null) {
-            JOptionPane.showMessageDialog(null, "Registro não encontrado");
-            return;
-        }
-
-        String novoNome = JOptionPane.showInputDialog(
-                "Novo nome:",
-                tipo.getNome()
-        );
-
-        int opcaoCategoria = Integer.parseInt(
-                JOptionPane.showInputDialog("""
-
-                    Selecione a categoria:
-
-                    1 - VESTUARIO
-                    2 - ALIMENTOS
-                    """)
-        );
-
-        CategoriaItem categoria;
-
-        switch (opcaoCategoria) {
-            case 1 -> categoria = CategoriaItem.VESTUARIO;
-            case 2 -> categoria = CategoriaItem.ALIMENTOS;
-            default -> {
-                JOptionPane.showMessageDialog(null, "Categoria inválida");
-                return;
-            }
-        }
-
-        tipo.setNome(novoNome);
-        tipo.setCategoria(categoria);
-
-        boolean atualizou = tipoService.atualizar(tipo);
-
-        if (atualizou) {
-            JOptionPane.showMessageDialog(null, "Atualizado com sucesso");
-        } else {
-            JOptionPane.showMessageDialog(null, "Erro ao atualizar");
-        }
-    }
-
-    private void deletarTipo() {
-
-        Long id = Long.parseLong(
-                JOptionPane.showInputDialog("Digite o ID:")
-        );
-
-        TipoDoacao tipo = tipoService.buscarPorId(id);
-
-        if (tipo == null) {
-            JOptionPane.showMessageDialog(null, "Tipo de doação não encontrado!");
-            return;
-        }
-
-        int confirmacao = JOptionPane.showConfirmDialog(
-                null,
-                "Confirma a exclusão do item abaixo?\n\n" +
-                        "ID: " + tipo.getId() + "\n" +
-                        "Nome: " + tipo.getNome(),
-                "Confirmar exclusão",
-                JOptionPane.OK_CANCEL_OPTION
-        );
-
-        if (confirmacao == JOptionPane.OK_OPTION) {
-            tipoService.deletar(id);
-            JOptionPane.showMessageDialog(null, "Deletado com sucesso!");
-        } else {
-            JOptionPane.showMessageDialog(null, "Exclusão cancelada.");
         }
     }
 }
