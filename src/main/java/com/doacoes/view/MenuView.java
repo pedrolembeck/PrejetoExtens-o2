@@ -120,14 +120,14 @@ public class MenuView extends JFrame {
                 "Doador",
                 "Gerenciar pessoas que realizam doações",
                 new Color(142, 68, 173),
-                e -> JOptionPane.showMessageDialog(this, "Módulo Doador\n(Em desenvolvimento - Dacio)")
+                e -> abrirDoador()
         ));
 
         painelCards.add(criarCardModulo(
                 "Receptor",
                 "Gerenciar pessoas que recebem doações",
                 new Color(230, 126, 34),
-                e -> JOptionPane.showMessageDialog(this, "Módulo Receptor\n(Em desenvolvimento - Dacio)")
+                e -> abrirReceptor()
         ));
 
         painelCards.add(criarCardModulo(
@@ -283,4 +283,14 @@ public class MenuView extends JFrame {
             ex.printStackTrace();
         }
     }
+    private void abrirDoador(){
+        DoadorView doadorView = new DoadorView();
+        doadorView.setVisible(true);
+    }
+
+    private void abrirReceptor(){
+        ReceptorView receptorVew = new  ReceptorView();
+        receptorVew.setVisible(true);
+    }
+
 }
