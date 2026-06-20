@@ -141,7 +141,7 @@ public class MenuView extends JFrame {
                 "Distribuição",
                 "Controlar a entrega das doações",
                 new Color(192, 57, 43),
-                e -> JOptionPane.showMessageDialog(this, "Módulo Distribuição\n(Em desenvolvimento - Pedro)")
+                e -> abrirDistribuicao()
         ));
 
         painel.add(painelCards, BorderLayout.CENTER);
@@ -292,5 +292,8 @@ public class MenuView extends JFrame {
         ReceptorView receptorVew = new  ReceptorView();
         receptorVew.setVisible(true);
     }
-
+    private void abrirDistribuicao() {
+       DistribuicaoView DistribuicaoView = new DistribuicaoView();
+        DistribuicaoView.setVisible(true);
+    }
 }

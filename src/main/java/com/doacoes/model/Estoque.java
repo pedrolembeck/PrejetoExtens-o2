@@ -51,11 +51,7 @@ public class Estoque {
 
     @Override
     public String toString() {
-        return "Estoque{" +
-                "id=" + id +
-                ", descricao='" + descricao + '\'' +
-                ", quantidade=" + quantidade +
-                ", categoria='" + categoria + '\'' +
-                '}';
+        return
+                  descricao ;
     }
 }
