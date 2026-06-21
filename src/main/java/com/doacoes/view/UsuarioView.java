@@ -9,7 +9,10 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.geom.RoundRectangle2D;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 public class UsuarioView extends JFrame {
 
@@ -17,6 +20,18 @@ public class UsuarioView extends JFrame {
 
     private JTable tabela;
     private DefaultTableModel modeloTabela;
+
+    private static final LinkedHashMap<String, String> TELAS_PERMISSAO = new LinkedHashMap<>();
+
+    static {
+        TELAS_PERMISSAO.put("TIPO_DOACAO", "Tipo de Doação");
+        TELAS_PERMISSAO.put("TAMANHOS", "Tamanhos");
+        TELAS_PERMISSAO.put("ESTOQUE", "Estoque");
+        TELAS_PERMISSAO.put("DOADOR", "Doador");
+        TELAS_PERMISSAO.put("RECEPTOR", "Receptor");
+        TELAS_PERMISSAO.put("DOACAO", "Doação");
+        TELAS_PERMISSAO.put("DISTRIBUICAO", "Distribuição");
+    }
 
     public UsuarioView() {
         service.inicializar();
@@ -322,7 +337,7 @@ public class UsuarioView extends JFrame {
                 true
         );
 
-        dialog.setSize(500, 520);
+        dialog.setSize(560, 680);
         dialog.setLocationRelativeTo(this);
         dialog.setResizable(false);
         dialog.setLayout(new BorderLayout());
@@ -361,21 +376,29 @@ public class UsuarioView extends JFrame {
                 "ADMIN", "USUARIO"
         });
         campoPerfil.setFont(new Font("Arial", Font.PLAIN, 14));
-        campoPerfil.setPreferredSize(new Dimension(360, 38));
+        campoPerfil.setPreferredSize(new Dimension(420, 38));
         campoPerfil.setBackground(Color.WHITE);
         campoPerfil.setForeground(new Color(44, 62, 80));
+
+        Map<String, JCheckBox> checksPermissao = criarChecksPermissao();
+        JPanel painelPermissoes = criarPainelPermissoes(checksPermissao);
 
         if (editando) {
             campoNome.setText(usuario.getNome());
             campoLogin.setText(usuario.getLogin());
             campoSenha.setText(usuario.getSenha());
             campoPerfil.setSelectedItem(usuario.getPerfil());
+            marcarPermissoes(checksPermissao, usuario);
         }
 
         adicionarCampo(form, gbc, 0, "Nome", campoNome);
         adicionarCampo(form, gbc, 2, "Login", campoLogin);
         adicionarCampo(form, gbc, 4, "Senha", campoSenha);
         adicionarCampo(form, gbc, 6, "Perfil", campoPerfil);
+        adicionarCampo(form, gbc, 8, "Permissões de telas para usuário comum", painelPermissoes);
+
+        campoPerfil.addActionListener(e -> atualizarPermissoesPorPerfil(campoPerfil, checksPermissao));
+        atualizarPermissoesPorPerfil(campoPerfil, checksPermissao);
 
         JScrollPane scrollForm = new JScrollPane(form);
         scrollForm.setBorder(null);
@@ -428,6 +451,7 @@ public class UsuarioView extends JFrame {
             novoUsuario.setLogin(login);
             novoUsuario.setSenha(senha);
             novoUsuario.setPerfil(perfil);
+            novoUsuario.setPermissoes(obterPermissoesSelecionadas(perfil, checksPermissao));
 
             resultado[0] = novoUsuario;
             dialog.dispose();
@@ -445,6 +469,87 @@ public class UsuarioView extends JFrame {
         dialog.setVisible(true);
 
         return resultado[0];
+    }
+
+    private Map<String, JCheckBox> criarChecksPermissao() {
+        Map<String, JCheckBox> checks = new LinkedHashMap<>();
+
+        for (Map.Entry<String, String> tela : TELAS_PERMISSAO.entrySet()) {
+            JCheckBox checkBox = new JCheckBox(tela.getValue());
+            checkBox.setFont(new Font("Arial", Font.PLAIN, 13));
+            checkBox.setForeground(new Color(44, 62, 80));
+            checkBox.setBackground(Color.WHITE);
+            checkBox.setFocusPainted(false);
+
+            checks.put(tela.getKey(), checkBox);
+        }
+
+        return checks;
+    }
+
+    private JPanel criarPainelPermissoes(Map<String, JCheckBox> checksPermissao) {
+        JPanel painel = new JPanel(new GridLayout(0, 2, 8, 6));
+        painel.setBackground(Color.WHITE);
+        painel.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(new Color(220, 225, 230)),
+                new EmptyBorder(10, 12, 10, 12)
+        ));
+
+        for (JCheckBox checkBox : checksPermissao.values()) {
+            painel.add(checkBox);
+        }
+
+        return painel;
+    }
+
+    private void marcarPermissoes(Map<String, JCheckBox> checksPermissao, Usuario usuario) {
+        if (usuario.getPermissoes() == null) {
+            return;
+        }
+
+        for (String permissao : usuario.getPermissoes()) {
+            JCheckBox checkBox = checksPermissao.get(permissao);
+
+            if (checkBox != null) {
+                checkBox.setSelected(true);
+            }
+        }
+    }
+
+    private void atualizarPermissoesPorPerfil(
+            JComboBox<String> campoPerfil,
+            Map<String, JCheckBox> checksPermissao
+    ) {
+        String perfil = campoPerfil.getSelectedItem().toString();
+
+        boolean habilitar = "USUARIO".equalsIgnoreCase(perfil);
+
+        for (JCheckBox checkBox : checksPermissao.values()) {
+            checkBox.setEnabled(habilitar);
+
+            if (!habilitar) {
+                checkBox.setSelected(false);
+            }
+        }
+    }
+
+    private List<String> obterPermissoesSelecionadas(
+            String perfil,
+            Map<String, JCheckBox> checksPermissao
+    ) {
+        List<String> permissoes = new ArrayList<>();
+
+        if (!"USUARIO".equalsIgnoreCase(perfil)) {
+            return permissoes;
+        }
+
+        for (Map.Entry<String, JCheckBox> entry : checksPermissao.entrySet()) {
+            if (entry.getValue().isSelected()) {
+                permissoes.add(entry.getKey());
+            }
+        }
+
+        return permissoes;
     }
 
     private void adicionarCampo(
@@ -473,7 +578,7 @@ public class UsuarioView extends JFrame {
 
     private void estilizarCampo(JTextField campo) {
         campo.setFont(new Font("Arial", Font.PLAIN, 14));
-        campo.setPreferredSize(new Dimension(360, 38));
+        campo.setPreferredSize(new Dimension(420, 38));
         campo.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createLineBorder(new Color(220, 225, 230)),
                 new EmptyBorder(8, 12, 8, 12)

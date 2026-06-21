@@ -1,5 +1,7 @@
 package com.doacoes.view;
 
+import com.doacoes.model.Usuario;
+
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
@@ -7,7 +9,14 @@ import java.awt.geom.RoundRectangle2D;
 
 public class MenuView extends JFrame {
 
+    private final Usuario usuarioLogado;
+
     public MenuView() {
+        this(null);
+    }
+
+    public MenuView(Usuario usuarioLogado) {
+        this.usuarioLogado = usuarioLogado;
         configurarJanela();
         construirInterface();
     }
@@ -51,7 +60,7 @@ public class MenuView extends JFrame {
         textos.add(Box.createVerticalStrut(4));
         textos.add(subtitulo);
 
-        JLabel usuario = new JLabel("Menu Principal");
+        JLabel usuario = new JLabel(obterTextoUsuarioLogado());
         usuario.setFont(new Font("Arial", Font.BOLD, 15));
         usuario.setForeground(Color.WHITE);
         usuario.setHorizontalAlignment(SwingConstants.RIGHT);
@@ -71,7 +80,7 @@ public class MenuView extends JFrame {
         instrucao.setFont(new Font("Arial", Font.BOLD, 18));
         instrucao.setForeground(new Color(44, 62, 80));
 
-        JLabel descricao = new JLabel("Acesse as funcionalidades do sistema de forma rápida e organizada.");
+        JLabel descricao = new JLabel(obterDescricaoPerfil());
         descricao.setFont(new Font("Arial", Font.PLAIN, 13));
         descricao.setForeground(new Color(100, 116, 139));
 
@@ -84,69 +93,111 @@ public class MenuView extends JFrame {
 
         painel.add(painelTexto, BorderLayout.NORTH);
 
-        JPanel painelCards = new JPanel(new GridLayout(4, 2, 18, 18));
+        JPanel painelCards = new JPanel(new GridLayout(0, 2, 18, 18));
         painelCards.setOpaque(false);
         painelCards.setBorder(new EmptyBorder(25, 0, 0, 0));
 
-        painelCards.add(criarCardModulo(
+        adicionarCardSePermitido(
+                painelCards,
+                "TIPO_DOACAO",
                 "Tipo de Doação",
                 "Cadastrar e organizar tipos de itens",
                 new Color(41, 128, 185),
                 e -> abrirTipoDoacao()
-        ));
+        );
 
-        painelCards.add(criarCardModulo(
+        adicionarCardSePermitido(
+                painelCards,
+                "USUARIOS",
                 "Usuários",
                 "Gerenciar acessos ao sistema",
                 new Color(52, 73, 94),
                 e -> abrirUsuarios()
-        ));
+        );
 
-        painelCards.add(criarCardModulo(
+        adicionarCardSePermitido(
+                painelCards,
+                "TAMANHOS",
                 "Tamanhos",
                 "Cadastrar tamanhos de roupas",
                 new Color(108, 92, 231),
                 e -> abrirTamanhos()
-        ));
+        );
 
-        painelCards.add(criarCardModulo(
+        adicionarCardSePermitido(
+                painelCards,
+                "ESTOQUE",
                 "Estoque",
                 "Acompanhar itens disponíveis",
                 new Color(39, 174, 96),
                 e -> abrirEstoque()
-        ));
+        );
 
-        painelCards.add(criarCardModulo(
+        adicionarCardSePermitido(
+                painelCards,
+                "DOADOR",
                 "Doador",
                 "Gerenciar pessoas que realizam doações",
                 new Color(142, 68, 173),
                 e -> abrirDoador()
-        ));
+        );
 
-        painelCards.add(criarCardModulo(
+        adicionarCardSePermitido(
+                painelCards,
+                "RECEPTOR",
                 "Receptor",
                 "Gerenciar pessoas que recebem doações",
                 new Color(230, 126, 34),
                 e -> abrirReceptor()
-        ));
+        );
 
-        painelCards.add(criarCardModulo(
+        adicionarCardSePermitido(
+                painelCards,
+                "DOACAO",
                 "Doação",
                 "Registrar novas doações recebidas",
                 new Color(22, 160, 133),
                 e -> abrirDoacao()
-        ));
+        );
 
-        painelCards.add(criarCardModulo(
+        adicionarCardSePermitido(
+                painelCards,
+                "DISTRIBUICAO",
                 "Distribuição",
                 "Controlar a entrega das doações",
                 new Color(192, 57, 43),
                 e -> abrirDistribuicao()
-        ));
+        );
 
-        painel.add(painelCards, BorderLayout.CENTER);
+        if (painelCards.getComponentCount() == 0) {
+            JLabel semPermissao = new JLabel("Nenhuma tela foi liberada para este usuário.");
+            semPermissao.setFont(new Font("Arial", Font.BOLD, 15));
+            semPermissao.setForeground(new Color(192, 57, 43));
+            semPermissao.setHorizontalAlignment(SwingConstants.CENTER);
+
+            JPanel painelSemPermissao = new JPanel(new BorderLayout());
+            painelSemPermissao.setOpaque(false);
+            painelSemPermissao.add(semPermissao, BorderLayout.CENTER);
+
+            painel.add(painelSemPermissao, BorderLayout.CENTER);
+        } else {
+            painel.add(painelCards, BorderLayout.CENTER);
+        }
 
         return painel;
+    }
+
+    private void adicionarCardSePermitido(
+            JPanel painelCards,
+            String tela,
+            String titulo,
+            String subtitulo,
+            Color cor,
+            java.awt.event.ActionListener acao
+    ) {
+        if (podeAcessar(tela)) {
+            painelCards.add(criarCardModulo(titulo, subtitulo, cor, acao));
+        }
     }
 
     private JButton criarCardModulo(String titulo, String subtitulo, Color cor,
@@ -245,31 +296,92 @@ public class MenuView extends JFrame {
         return rodape;
     }
 
+    private boolean usuarioEhAdmin() {
+        if (usuarioLogado == null) {
+            return true;
+        }
+
+        return usuarioLogado.getPerfil() != null
+                && usuarioLogado.getPerfil().equalsIgnoreCase("ADMIN");
+    }
+
+    private boolean podeAcessar(String tela) {
+        if (usuarioEhAdmin()) {
+            return true;
+        }
+
+        return usuarioLogado != null && usuarioLogado.temPermissao(tela);
+    }
+
+    private String obterTextoUsuarioLogado() {
+        if (usuarioLogado == null) {
+            return "Menu Principal";
+        }
+
+        String nome = usuarioLogado.getNome() == null ? "Usuário" : usuarioLogado.getNome();
+        String perfil = usuarioLogado.getPerfil() == null ? "" : usuarioLogado.getPerfil();
+
+        return nome + " • " + perfil;
+    }
+
+    private String obterDescricaoPerfil() {
+        if (usuarioEhAdmin()) {
+            return "Perfil administrador: acesso completo aos módulos e configurações do sistema.";
+        }
+
+        return "Perfil usuário: acesso liberado conforme permissões definidas pelo administrador.";
+    }
+
     public void iniciar() {
         setVisible(true);
     }
 
     private void abrirUsuarios() {
+        if (!podeAcessar("USUARIOS")) {
+            exibirAcessoNegado();
+            return;
+        }
+
         UsuarioView usuarioView = new UsuarioView();
         usuarioView.setVisible(true);
     }
 
     private void abrirEstoque() {
+        if (!podeAcessar("ESTOQUE")) {
+            exibirAcessoNegado();
+            return;
+        }
+
         EstoqueView estoqueView = new EstoqueView();
         estoqueView.setVisible(true);
     }
 
     private void abrirDoacao() {
+        if (!podeAcessar("DOACAO")) {
+            exibirAcessoNegado();
+            return;
+        }
+
         DoacaoView doacaoView = new DoacaoView();
         doacaoView.setVisible(true);
     }
 
     private void abrirTamanhos() {
+        if (!podeAcessar("TAMANHOS")) {
+            exibirAcessoNegado();
+            return;
+        }
+
         TamanhoRoupaView tamanhoRoupaView = new TamanhoRoupaView();
         tamanhoRoupaView.setVisible(true);
     }
 
     private void abrirTipoDoacao() {
+        if (!podeAcessar("TIPO_DOACAO")) {
+            exibirAcessoNegado();
+            return;
+        }
+
         try {
             TipoDoacaoView tipoDoacaoView = new TipoDoacaoView();
             tipoDoacaoView.setVisible(true);
@@ -283,17 +395,43 @@ public class MenuView extends JFrame {
             ex.printStackTrace();
         }
     }
-    private void abrirDoador(){
+
+    private void abrirDoador() {
+        if (!podeAcessar("DOADOR")) {
+            exibirAcessoNegado();
+            return;
+        }
+
         DoadorView doadorView = new DoadorView();
         doadorView.setVisible(true);
     }
 
-    private void abrirReceptor(){
-        ReceptorView receptorVew = new  ReceptorView();
-        receptorVew.setVisible(true);
+    private void abrirReceptor() {
+        if (!podeAcessar("RECEPTOR")) {
+            exibirAcessoNegado();
+            return;
+        }
+
+        ReceptorView receptorView = new ReceptorView();
+        receptorView.setVisible(true);
     }
+
     private void abrirDistribuicao() {
-       DistribuicaoView DistribuicaoView = new DistribuicaoView();
-        DistribuicaoView.setVisible(true);
+        if (!podeAcessar("DISTRIBUICAO")) {
+            exibirAcessoNegado();
+            return;
+        }
+
+        DistribuicaoView distribuicaoView = new DistribuicaoView();
+        distribuicaoView.setVisible(true);
+    }
+
+    private void exibirAcessoNegado() {
+        JOptionPane.showMessageDialog(
+                this,
+                "Essa tela não foi liberada para o seu usuário.",
+                "Acesso negado",
+                JOptionPane.WARNING_MESSAGE
+        );
     }
 }

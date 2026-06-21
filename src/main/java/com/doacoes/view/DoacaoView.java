@@ -1,8 +1,10 @@
 package com.doacoes.view;
 
+import com.doacoes.model.Doador;
 import com.doacoes.model.Doacao;
 import com.doacoes.model.TamanhoRoupa;
 import com.doacoes.model.TipoDoacao;
+import com.doacoes.service.DoadorService;
 import com.doacoes.service.DoacaoService;
 import com.doacoes.service.TamanhoRoupaService;
 import com.doacoes.service.TipoDoacaoService;
@@ -12,6 +14,8 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.geom.RoundRectangle2D;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -28,6 +32,7 @@ public class DoacaoView extends JFrame {
     private final DoacaoService service = new DoacaoService();
     private final TamanhoRoupaService tamanhoRoupaService = new TamanhoRoupaService();
     private final TipoDoacaoService tipoDoacaoService = new TipoDoacaoService();
+    private final DoadorService doadorService = new DoadorService();
 
     private JTable tabela;
     private DefaultTableModel modeloTabela;
@@ -36,6 +41,8 @@ public class DoacaoView extends JFrame {
     public DoacaoView() {
         service.inicializar();
         tamanhoRoupaService.inicializar();
+        doadorService.inicializar();
+
         configurarJanela();
         construirInterface();
         carregarTabela();
@@ -392,7 +399,7 @@ public class DoacaoView extends JFrame {
                 true
         );
 
-        dialog.setSize(620, 720);
+        dialog.setSize(820, 640);
         dialog.setLocationRelativeTo(this);
         dialog.setResizable(false);
         dialog.setLayout(new BorderLayout());
@@ -410,16 +417,33 @@ public class DoacaoView extends JFrame {
 
         JPanel form = new JPanel(new GridBagLayout());
         form.setBackground(Color.WHITE);
-        form.setBorder(new EmptyBorder(16, 30, 16, 30));
+        form.setBorder(new EmptyBorder(22, 30, 18, 30));
 
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(6, 0, 6, 0);
+        gbc.insets = new Insets(6, 8, 6, 8);
         gbc.fill = GridBagConstraints.HORIZONTAL;
-        gbc.gridx = 0;
         gbc.weightx = 1;
 
         JTextField campoDoador = new JTextField();
         estilizarCampoTexto(campoDoador);
+
+        final Doador[] doadorSelecionado = new Doador[1];
+
+        JButton btnBuscarDoador = criarBotaoDialog("Buscar", new Color(52, 73, 94));
+        btnBuscarDoador.addActionListener(e -> {
+            Doador doadorEncontrado = abrirSelecaoDoador(dialog, campoDoador.getText().trim());
+
+            if (doadorEncontrado != null) {
+                doadorSelecionado[0] = doadorEncontrado;
+                campoDoador.setText(doadorEncontrado.getNome());
+                campoDoador.setToolTipText("CPF: " + textoSeguro(doadorEncontrado.getCpf()));
+            }
+        });
+
+        JPanel painelDoador = new JPanel(new BorderLayout(10, 0));
+        painelDoador.setOpaque(false);
+        painelDoador.add(campoDoador, BorderLayout.CENTER);
+        painelDoador.add(btnBuscarDoador, BorderLayout.EAST);
 
         JComboBox<String> campoItem = new JComboBox<>();
         campoItem.setEditable(true);
@@ -482,20 +506,25 @@ public class DoacaoView extends JFrame {
             atualizarCamposPorCategoria(campoCategoria, campoTamanho, campoUnidade, campoDetalheUnidade);
         });
 
-        adicionarCampo(form, gbc, 0, "Doador", campoDoador);
-        adicionarCampo(form, gbc, 2, "Item / Tipo de Doação", campoItem);
-        adicionarCampo(form, gbc, 4, "Quantidade", campoQuantidade);
-        adicionarCampo(form, gbc, 6, "Unidade", campoUnidade);
-        adicionarCampo(form, gbc, 8, "Detalhe da unidade", campoDetalheUnidade);
-        adicionarCampo(form, gbc, 10, "Categoria", campoCategoria);
-        adicionarCampo(form, gbc, 12, "Tamanho", campoTamanho);
-        adicionarCampo(form, gbc, 14, "Data da doação", campoData);
-        adicionarCampo(form, gbc, 16, "Observação", campoObservacao);
+        adicionarCampoLarguraTotal(
+                form,
+                gbc,
+                0,
+                "Doador cadastrado - digite nome ou CPF e clique em Buscar",
+                painelDoador
+        );
 
-        JScrollPane scrollForm = new JScrollPane(form);
-        scrollForm.setBorder(null);
-        scrollForm.getViewport().setBackground(Color.WHITE);
-        scrollForm.getVerticalScrollBar().setUnitIncrement(16);
+        adicionarCampoDuasColunas(form, gbc, 2, 0, "Item / Tipo de Doação", campoItem);
+        adicionarCampoDuasColunas(form, gbc, 2, 1, "Categoria", campoCategoria);
+
+        adicionarCampoDuasColunas(form, gbc, 4, 0, "Quantidade", campoQuantidade);
+        adicionarCampoDuasColunas(form, gbc, 4, 1, "Unidade", campoUnidade);
+
+        adicionarCampoDuasColunas(form, gbc, 6, 0, "Detalhe da unidade", campoDetalheUnidade);
+        adicionarCampoDuasColunas(form, gbc, 6, 1, "Tamanho", campoTamanho);
+
+        adicionarCampoDuasColunas(form, gbc, 8, 0, "Data da doação", campoData);
+        adicionarCampoDuasColunas(form, gbc, 8, 1, "Observação", campoObservacao);
 
         JPanel rodapeDialog = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 12));
         rodapeDialog.setBackground(Color.WHITE);
@@ -510,10 +539,22 @@ public class DoacaoView extends JFrame {
         btnCancelar.addActionListener(e -> dialog.dispose());
 
         btnSalvar.addActionListener(e -> {
+            if (doadorSelecionado[0] == null) {
+                Doador doadorEncontrado = abrirSelecaoDoador(dialog, campoDoador.getText().trim());
+
+                if (doadorEncontrado == null) {
+                    return;
+                }
+
+                doadorSelecionado[0] = doadorEncontrado;
+                campoDoador.setText(doadorEncontrado.getNome());
+            }
+
             Doacao novaDoacao = montarDoacaoFormulario(
                     dialog,
                     doacao,
                     campoDoador,
+                    doadorSelecionado[0],
                     campoItem,
                     campoQuantidade,
                     campoUnidade,
@@ -534,8 +575,10 @@ public class DoacaoView extends JFrame {
         rodapeDialog.add(btnSalvar);
 
         dialog.add(cabecalho, BorderLayout.NORTH);
-        dialog.add(scrollForm, BorderLayout.CENTER);
+        dialog.add(form, BorderLayout.CENTER);
         dialog.add(rodapeDialog, BorderLayout.SOUTH);
+
+        campoDoador.addActionListener(e -> btnBuscarDoador.doClick());
 
         SwingUtilities.invokeLater(() -> campoDoador.requestFocus());
 
@@ -544,7 +587,213 @@ public class DoacaoView extends JFrame {
         return resultado[0];
     }
 
-    private void adicionarCampo(
+    private Doador abrirSelecaoDoador(Component parent, String termoInicial) {
+        final Doador[] doadorSelecionado = new Doador[1];
+
+        JDialog dialog = new JDialog(this, "Selecionar Doador", true);
+        dialog.setSize(760, 480);
+        dialog.setLocationRelativeTo(parent);
+        dialog.setResizable(false);
+        dialog.setLayout(new BorderLayout());
+        dialog.getContentPane().setBackground(new Color(241, 245, 249));
+
+        JPanel cabecalho = new JPanel(new BorderLayout());
+        cabecalho.setBackground(new Color(52, 73, 94));
+        cabecalho.setBorder(new EmptyBorder(18, 25, 18, 25));
+
+        JLabel titulo = new JLabel("Buscar doador cadastrado");
+        titulo.setFont(new Font("Arial", Font.BOLD, 20));
+        titulo.setForeground(Color.WHITE);
+
+        JLabel subtitulo = new JLabel("Pesquise por nome, CPF, telefone, e-mail ou endereço.");
+        subtitulo.setFont(new Font("Arial", Font.PLAIN, 13));
+        subtitulo.setForeground(new Color(235, 245, 245));
+
+        JPanel textos = new JPanel();
+        textos.setOpaque(false);
+        textos.setLayout(new BoxLayout(textos, BoxLayout.Y_AXIS));
+        textos.add(titulo);
+        textos.add(Box.createVerticalStrut(4));
+        textos.add(subtitulo);
+
+        cabecalho.add(textos, BorderLayout.WEST);
+
+        JPanel conteudo = new JPanel(new BorderLayout(0, 14));
+        conteudo.setBackground(Color.WHITE);
+        conteudo.setBorder(new EmptyBorder(18, 22, 18, 22));
+
+        JPanel painelBusca = new JPanel(new BorderLayout(10, 0));
+        painelBusca.setOpaque(false);
+
+        JTextField campoBusca = new JTextField();
+        estilizarCampoTexto(campoBusca);
+        campoBusca.setText(termoInicial == null ? "" : termoInicial);
+
+        JButton btnPesquisar = criarBotaoDialog("Pesquisar", new Color(52, 73, 94));
+
+        painelBusca.add(campoBusca, BorderLayout.CENTER);
+        painelBusca.add(btnPesquisar, BorderLayout.EAST);
+
+        String[] colunas = {"ID", "Nome", "CPF", "Telefone", "E-mail", "Endereço"};
+
+        DefaultTableModel modeloDoador = new DefaultTableModel(colunas, 0) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+        };
+
+        JTable tabelaDoador = new JTable(modeloDoador);
+        tabelaDoador.setRowHeight(32);
+        tabelaDoador.setFont(new Font("Arial", Font.PLAIN, 13));
+        tabelaDoador.setForeground(new Color(44, 62, 80));
+        tabelaDoador.setSelectionBackground(new Color(209, 242, 235));
+        tabelaDoador.setSelectionForeground(new Color(44, 62, 80));
+        tabelaDoador.setGridColor(new Color(230, 235, 240));
+        tabelaDoador.setShowVerticalLines(false);
+        tabelaDoador.setAutoCreateRowSorter(true);
+
+        tabelaDoador.getTableHeader().setFont(new Font("Arial", Font.BOLD, 13));
+        tabelaDoador.getTableHeader().setBackground(new Color(44, 62, 80));
+        tabelaDoador.getTableHeader().setForeground(Color.WHITE);
+        tabelaDoador.getTableHeader().setPreferredSize(new Dimension(0, 34));
+        tabelaDoador.getTableHeader().setReorderingAllowed(false);
+
+        tabelaDoador.getColumnModel().getColumn(0).setPreferredWidth(50);
+        tabelaDoador.getColumnModel().getColumn(1).setPreferredWidth(180);
+        tabelaDoador.getColumnModel().getColumn(2).setPreferredWidth(115);
+        tabelaDoador.getColumnModel().getColumn(3).setPreferredWidth(115);
+        tabelaDoador.getColumnModel().getColumn(4).setPreferredWidth(150);
+        tabelaDoador.getColumnModel().getColumn(5).setPreferredWidth(190);
+
+        DefaultTableCellRenderer centralizado = new DefaultTableCellRenderer();
+        centralizado.setHorizontalAlignment(SwingConstants.CENTER);
+        tabelaDoador.getColumnModel().getColumn(0).setCellRenderer(centralizado);
+        tabelaDoador.getColumnModel().getColumn(2).setCellRenderer(centralizado);
+        tabelaDoador.getColumnModel().getColumn(3).setCellRenderer(centralizado);
+
+        JScrollPane scroll = new JScrollPane(tabelaDoador);
+        scroll.setBorder(BorderFactory.createLineBorder(new Color(226, 232, 240)));
+        scroll.getViewport().setBackground(Color.WHITE);
+
+        conteudo.add(painelBusca, BorderLayout.NORTH);
+        conteudo.add(scroll, BorderLayout.CENTER);
+
+        JPanel rodape = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 12));
+        rodape.setBackground(Color.WHITE);
+        rodape.setBorder(new EmptyBorder(0, 20, 10, 20));
+
+        JButton btnCancelar = criarBotaoDialog("Cancelar", new Color(127, 140, 141));
+        JButton btnSelecionar = criarBotaoDialog("Selecionar", new Color(39, 174, 96));
+
+        btnCancelar.addActionListener(e -> dialog.dispose());
+
+        btnSelecionar.addActionListener(e -> {
+            Doador doador = obterDoadorSelecionadoNaTabela(tabelaDoador, modeloDoador, dialog);
+
+            if (doador != null) {
+                doadorSelecionado[0] = doador;
+                dialog.dispose();
+            }
+        });
+
+        btnPesquisar.addActionListener(e -> carregarTabelaDoadores(modeloDoador, campoBusca.getText().trim()));
+
+        campoBusca.addActionListener(e -> btnPesquisar.doClick());
+
+        tabelaDoador.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (e.getClickCount() == 2) {
+                    Doador doador = obterDoadorSelecionadoNaTabela(tabelaDoador, modeloDoador, dialog);
+
+                    if (doador != null) {
+                        doadorSelecionado[0] = doador;
+                        dialog.dispose();
+                    }
+                }
+            }
+        });
+
+        rodape.add(btnCancelar);
+        rodape.add(btnSelecionar);
+
+        dialog.add(cabecalho, BorderLayout.NORTH);
+        dialog.add(conteudo, BorderLayout.CENTER);
+        dialog.add(rodape, BorderLayout.SOUTH);
+
+        carregarTabelaDoadores(modeloDoador, campoBusca.getText().trim());
+
+        SwingUtilities.invokeLater(() -> campoBusca.requestFocus());
+
+        dialog.setVisible(true);
+
+        return doadorSelecionado[0];
+    }
+
+    private void carregarTabelaDoadores(DefaultTableModel modeloDoador, String termo) {
+        modeloDoador.setRowCount(0);
+
+        String termoLimpo = termo == null ? "" : termo.trim().toLowerCase();
+
+        for (Doador doador : doadorService.listar()) {
+            if (termoLimpo.isBlank() || doadorCombinaComTermo(doador, termoLimpo)) {
+                modeloDoador.addRow(new Object[]{
+                        doador.getId(),
+                        doador.getNome(),
+                        doador.getCpf(),
+                        doador.getTelefone(),
+                        doador.getEmail(),
+                        doador.getEndereco()
+                });
+            }
+        }
+    }
+
+    private boolean doadorCombinaComTermo(Doador doador, String termo) {
+        String termoNumerico = termo.replaceAll("[^0-9]", "");
+
+        String nome = textoSeguro(doador.getNome()).toLowerCase();
+        String cpf = textoSeguro(doador.getCpf()).toLowerCase();
+        String cpfNumerico = cpf.replaceAll("[^0-9]", "");
+        String telefone = textoSeguro(doador.getTelefone()).toLowerCase();
+        String email = textoSeguro(doador.getEmail()).toLowerCase();
+        String endereco = textoSeguro(doador.getEndereco()).toLowerCase();
+
+        return nome.contains(termo)
+                || cpf.contains(termo)
+                || (!termoNumerico.isBlank() && cpfNumerico.contains(termoNumerico))
+                || telefone.contains(termo)
+                || email.contains(termo)
+                || endereco.contains(termo);
+    }
+
+    private Doador obterDoadorSelecionadoNaTabela(
+            JTable tabelaDoador,
+            DefaultTableModel modeloDoador,
+            Component parent
+    ) {
+        int linha = tabelaDoador.getSelectedRow();
+
+        if (linha == -1) {
+            JOptionPane.showMessageDialog(parent, "Selecione um doador na tabela.", "Atenção", JOptionPane.WARNING_MESSAGE);
+            return null;
+        }
+
+        int linhaModelo = tabelaDoador.convertRowIndexToModel(linha);
+        Long id = Long.valueOf(modeloDoador.getValueAt(linhaModelo, 0).toString());
+
+        Doador doador = doadorService.buscarPorId(id);
+
+        if (doador == null) {
+            JOptionPane.showMessageDialog(parent, "Doador não encontrado.", "Erro", JOptionPane.ERROR_MESSAGE);
+            return null;
+        }
+
+        return doador;
+    }
+
+    private void adicionarCampoLarguraTotal(
             JPanel form,
             GridBagConstraints gbc,
             int linha,
@@ -555,7 +804,36 @@ public class DoacaoView extends JFrame {
         lbl.setFont(new Font("Arial", Font.BOLD, 13));
         lbl.setForeground(new Color(52, 73, 94));
 
+        gbc.gridx = 0;
         gbc.gridy = linha;
+        gbc.gridwidth = 2;
+        gbc.weightx = 1;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        form.add(lbl, gbc);
+
+        gbc.gridy = linha + 1;
+        form.add(campo, gbc);
+
+        gbc.gridwidth = 1;
+    }
+
+    private void adicionarCampoDuasColunas(
+            JPanel form,
+            GridBagConstraints gbc,
+            int linha,
+            int coluna,
+            String label,
+            JComponent campo
+    ) {
+        JLabel lbl = new JLabel(label);
+        lbl.setFont(new Font("Arial", Font.BOLD, 13));
+        lbl.setForeground(new Color(52, 73, 94));
+
+        gbc.gridx = coluna;
+        gbc.gridy = linha;
+        gbc.gridwidth = 1;
+        gbc.weightx = 1;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
         form.add(lbl, gbc);
 
         gbc.gridy = linha + 1;
@@ -566,6 +844,7 @@ public class DoacaoView extends JFrame {
             JDialog dialog,
             Doacao doacaoEdicao,
             JTextField campoDoador,
+            Doador doadorSelecionado,
             JComboBox<String> campoItem,
             JTextField campoQuantidade,
             JComboBox<String> campoUnidade,
@@ -576,7 +855,10 @@ public class DoacaoView extends JFrame {
             JTextField campoObservacao
     ) {
         try {
-            String doador = campoDoador.getText().trim();
+            String doador = doadorSelecionado != null
+                    ? doadorSelecionado.getNome()
+                    : campoDoador.getText().trim();
+
             String itemSelecionado = obterTextoCombo(campoItem).toUpperCase();
             String categoriaSelecionada = campoCategoria.getSelectedItem().toString();
             String unidadeSelecionada = campoUnidade.getSelectedItem().toString();
@@ -587,7 +869,7 @@ public class DoacaoView extends JFrame {
                     : campoTamanho.getSelectedItem().toString();
 
             if (doador.isEmpty()) {
-                JOptionPane.showMessageDialog(dialog, "Informe o nome do doador.", "Atenção", JOptionPane.WARNING_MESSAGE);
+                JOptionPane.showMessageDialog(dialog, "Selecione o doador.", "Atenção", JOptionPane.WARNING_MESSAGE);
                 campoDoador.requestFocus();
                 return null;
             }
@@ -628,6 +910,8 @@ public class DoacaoView extends JFrame {
             }
 
             novaDoacao.setNomeDoador(doador);
+            aplicarIdDoadorSeExistir(novaDoacao, doadorSelecionado == null ? null : doadorSelecionado.getId());
+
             novaDoacao.setDescricaoItem(itemSelecionado);
             novaDoacao.setQuantidade(quantidade);
             novaDoacao.setUnidade(unidadeSelecionada);
@@ -650,6 +934,39 @@ public class DoacaoView extends JFrame {
         }
     }
 
+    private void aplicarIdDoadorSeExistir(Doacao doacao, Long idDoador) {
+        if (doacao == null || idDoador == null) {
+            return;
+        }
+
+        try {
+            doacao.getClass().getMethod("setIdDoador", Long.class).invoke(doacao, idDoador);
+            return;
+        } catch (Exception ignored) {
+        }
+
+        try {
+            doacao.getClass().getMethod("setIdDoador", long.class).invoke(doacao, idDoador);
+            return;
+        } catch (Exception ignored) {
+        }
+
+        try {
+            doacao.getClass().getMethod("setDoadorId", Long.class).invoke(doacao, idDoador);
+            return;
+        } catch (Exception ignored) {
+        }
+
+        try {
+            doacao.getClass().getMethod("setDoadorId", long.class).invoke(doacao, idDoador);
+        } catch (Exception ignored) {
+        }
+    }
+
+    private String textoSeguro(String texto) {
+        return texto == null ? "" : texto;
+    }
+
     private JButton criarBotaoDialog(String texto, Color cor) {
         RoundedButton btn = new RoundedButton(texto, cor);
         btn.setPreferredSize(new Dimension(150, 36));
@@ -658,7 +975,7 @@ public class DoacaoView extends JFrame {
 
     private void estilizarCampoTexto(JTextField campo) {
         campo.setFont(new Font("Arial", Font.PLAIN, 14));
-        campo.setPreferredSize(new Dimension(430, 36));
+        campo.setPreferredSize(new Dimension(330, 36));
         campo.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createLineBorder(new Color(220, 225, 230)),
                 new EmptyBorder(7, 12, 7, 12)
@@ -669,7 +986,7 @@ public class DoacaoView extends JFrame {
 
     private void estilizarCombo(JComboBox<String> combo) {
         combo.setFont(new Font("Arial", Font.PLAIN, 14));
-        combo.setPreferredSize(new Dimension(430, 36));
+        combo.setPreferredSize(new Dimension(330, 36));
         combo.setBackground(Color.WHITE);
         combo.setForeground(new Color(44, 62, 80));
     }

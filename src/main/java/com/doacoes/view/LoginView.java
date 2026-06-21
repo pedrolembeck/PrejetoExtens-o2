@@ -249,7 +249,7 @@ public class LoginView extends JFrame {
         Usuario usuario = usuarioService.autenticar(login, senha);
 
         if (usuario != null) {
-            MenuView menuView = new MenuView();
+            MenuView menuView = new MenuView(usuario);
             menuView.setVisible(true);
 
             dispose();

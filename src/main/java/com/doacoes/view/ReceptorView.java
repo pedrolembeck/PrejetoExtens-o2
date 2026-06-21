@@ -7,8 +7,10 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.text.MaskFormatter;
 import java.awt.*;
 import java.awt.geom.RoundRectangle2D;
+import java.text.ParseException;
 import java.util.List;
 
 public class ReceptorView extends JFrame {
@@ -354,8 +356,7 @@ public class ReceptorView extends JFrame {
         JTextField campoNome = new JTextField();
         estilizarCampo(campoNome);
 
-        JTextField campoCpf = new JTextField();
-        estilizarCampo(campoCpf);
+        JFormattedTextField campoCpf = criarCampoCpf();
 
         JTextField campoTelefone = new JTextField();
         estilizarCampo(campoTelefone);
@@ -371,7 +372,7 @@ public class ReceptorView extends JFrame {
 
         if (editando) {
             campoNome.setText(receptor.getNome());
-            campoCpf.setText(receptor.getCpf());
+            campoCpf.setText(formatarCpfParaMascara(receptor.getCpf()));
             campoTelefone.setText(receptor.getTelefone());
             campoEmail.setText(receptor.getEmail());
             campoEndereco.setText(receptor.getEndereco());
@@ -405,6 +406,7 @@ public class ReceptorView extends JFrame {
         btnSalvar.addActionListener(e -> {
             String nome = campoNome.getText().trim();
             String cpf = campoCpf.getText().trim();
+            String cpfLimpo = cpf.replaceAll("[^0-9]", "");
             String telefone = campoTelefone.getText().trim();
             String email = campoEmail.getText().trim();
             String endereco = campoEndereco.getText().trim();
@@ -419,7 +421,7 @@ public class ReceptorView extends JFrame {
             Receptor novoReceptor = new Receptor(
                     editando ? receptor.getId() : null,
                     nome,
-                    cpf.isEmpty() ? null : cpf,
+                    cpfLimpo.isEmpty() ? null : cpf,
                     endereco.isEmpty() ? null : endereco,
                     telefone.isEmpty() ? null : telefone,
                     email.isEmpty() ? null : email,
@@ -442,6 +444,46 @@ public class ReceptorView extends JFrame {
         dialog.setVisible(true);
 
         return resultado[0];
+    }
+
+    private JFormattedTextField criarCampoCpf() {
+        try {
+            MaskFormatter mascara = new MaskFormatter("###.###.###-##");
+            mascara.setPlaceholderCharacter('_');
+            mascara.setValueContainsLiteralCharacters(true);
+
+            JFormattedTextField campo = new JFormattedTextField(mascara);
+            campo.setFont(new Font("Arial", Font.PLAIN, 14));
+            campo.setPreferredSize(new Dimension(360, 38));
+            campo.setBorder(BorderFactory.createCompoundBorder(
+                    BorderFactory.createLineBorder(new Color(220, 225, 230)),
+                    new EmptyBorder(8, 12, 8, 12)
+            ));
+            campo.setBackground(new Color(250, 250, 250));
+            campo.setForeground(new Color(44, 62, 80));
+
+            return campo;
+
+        } catch (ParseException e) {
+            throw new RuntimeException("Erro ao criar máscara de CPF", e);
+        }
+    }
+
+    private String formatarCpfParaMascara(String cpf) {
+        if (cpf == null || cpf.isBlank()) {
+            return "";
+        }
+
+        String cpfLimpo = cpf.replaceAll("[^0-9]", "");
+
+        if (cpfLimpo.length() != 11) {
+            return cpf;
+        }
+
+        return cpfLimpo.substring(0, 3) + "." +
+                cpfLimpo.substring(3, 6) + "." +
+                cpfLimpo.substring(6, 9) + "-" +
+                cpfLimpo.substring(9, 11);
     }
 
     private void adicionarCampo(JPanel form, GridBagConstraints gbc, int linha, String label, JComponent campo) {

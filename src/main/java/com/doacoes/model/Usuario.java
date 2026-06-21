@@ -1,5 +1,8 @@
 package com.doacoes.model;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Usuario {
 
     private Long id;
@@ -7,6 +10,7 @@ public class Usuario {
     private String login;
     private String senha;
     private String perfil;
+    private List<String> permissoes = new ArrayList<>();
 
     public Usuario() {
     }
@@ -57,5 +61,25 @@ public class Usuario {
 
     public void setPerfil(String perfil) {
         this.perfil = perfil;
+    }
+
+    public List<String> getPermissoes() {
+        return permissoes;
+    }
+
+    public void setPermissoes(List<String> permissoes) {
+        this.permissoes = permissoes == null ? new ArrayList<>() : permissoes;
+    }
+
+    public boolean isAdmin() {
+        return perfil != null && perfil.equalsIgnoreCase("ADMIN");
+    }
+
+    public boolean temPermissao(String tela) {
+        if (isAdmin()) {
+            return true;
+        }
+
+        return permissoes != null && permissoes.contains(tela);
     }
 }
