@@ -1,115 +1,189 @@
 package com.doacoes.service;
 
-import com.doacoes.dao.DoadorDAO;
-import com.doacoes.model.Doador;
+import com.doacoes.dto.DoadorRequestDTO;
+import com.doacoes.entity.Doador;
+import com.doacoes.repository.DoadorRepository;
+import jakarta.persistence.EntityNotFoundException;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import javax.swing.JOptionPane;
 import java.util.List;
 
+@Service
 public class DoadorService {
 
-    private final DoadorDAO dao = new DoadorDAO();
+    private final DoadorRepository doadorRepository;
 
-    public void inicializar() {
-        dao.criarTabela();
+    public DoadorService(DoadorRepository doadorRepository) {
+        this.doadorRepository = doadorRepository;
     }
 
-    public boolean salvar(Doador doador) {
-        if (!validar(doador)) {
-            return false;
-        }
+    // =========================
+    // CREATE
+    // =========================
 
-        formatar(doador);
+    @Transactional
+    public Doador salvar(DoadorRequestDTO dto) {
 
-        try {
-            dao.salvar(doador);
-            return true;
-        } catch (RuntimeException e) {
-            JOptionPane.showMessageDialog(null, "Erro ao salvar doador. Verifique os dados informados.");
-            return false;
-        }
+        validarCpf(dto.getCpf());
+
+        Doador doador = new Doador();
+
+        preencherDoador(doador, dto);
+
+        return doadorRepository.save(doador);
     }
+
+    // =========================
+    // READ - LISTAR
+    // =========================
 
     public List<Doador> listar() {
-        return dao.listar();
+        return doadorRepository.findAll();
     }
+
+    // =========================
+    // READ - BUSCAR POR ID
+    // =========================
 
     public Doador buscarPorId(Long id) {
-        return dao.buscarPorId(id);
+
+        return doadorRepository.findById(id)
+                .orElseThrow(() ->
+                        new EntityNotFoundException(
+                                "Doador não encontrado"
+                        ));
     }
 
-    public boolean atualizar(Doador doador) {
-        if (!validar(doador)) {
-            return false;
-        }
+    // =========================
+    // UPDATE
+    // =========================
 
-        formatar(doador);
+    @Transactional
+    public Doador atualizar(
+            Long id,
+            DoadorRequestDTO dto) {
 
-        try {
-            dao.atualizar(doador);
-            return true;
-        } catch (RuntimeException e) {
-            JOptionPane.showMessageDialog(null, "Erro ao atualizar doador. Verifique os dados informados.");
-            return false;
-        }
+        validarCpf(dto.getCpf());
+
+        Doador doador = buscarPorId(id);
+
+        preencherDoador(doador, dto);
+
+        return doadorRepository.save(doador);
     }
 
+    // =========================
+    // DELETE
+    // =========================
+
+    @Transactional
     public void deletar(Long id) {
-        Doador doador = dao.buscarPorId(id);
 
-        if (doador == null) {
-            JOptionPane.showMessageDialog(null, "Doador não encontrado!");
-            return;
-        }
+        Doador doador = buscarPorId(id);
 
-        dao.deletar(id);
+        doadorRepository.delete(doador);
     }
+
+    // =========================
+    // PESQUISAR
+    // =========================
 
     public List<Doador> pesquisar(String termo) {
+
         if (termo == null || termo.isBlank()) {
             return listar();
         }
 
-        return dao.pesquisar(termo.trim());
+        return doadorRepository.pesquisar(
+                termo.trim()
+        );
     }
 
-    private boolean validar(Doador doador) {
-        if (doador.getNome() == null || doador.getNome().isBlank()) {
-            JOptionPane.showMessageDialog(null, "Nome é obrigatório!");
-            return false;
+    // =========================
+    // PREENCHER / FORMATAR
+    // =========================
+
+    private void preencherDoador(
+            Doador doador,
+            DoadorRequestDTO dto) {
+
+        // Nome em maiúsculo
+        doador.setNome(
+                dto.getNome()
+                        .trim()
+                        .toUpperCase()
+        );
+
+        // CPF
+        if (dto.getCpf() != null
+                && !dto.getCpf().isBlank()) {
+
+            doador.setCpf(
+                    dto.getCpf().trim()
+            );
+
+        } else {
+            doador.setCpf(null);
         }
 
-        if (doador.getCpf() != null && !doador.getCpf().isBlank()) {
-            String cpfLimpo = doador.getCpf().replaceAll("[^0-9]", "");
-            if (cpfLimpo.length() != 11) {
-                JOptionPane.showMessageDialog(null, "CPF inválido! Informe 11 dígitos.");
-                return false;
-            }
+        // Endereço
+        if (dto.getEndereco() != null
+                && !dto.getEndereco().isBlank()) {
+
+            doador.setEndereco(
+                    dto.getEndereco().trim()
+            );
+
+        } else {
+            doador.setEndereco(null);
         }
 
-        if (doador.getEmail() != null && !doador.getEmail().isBlank()) {
-            if (!doador.getEmail().contains("@")) {
-                JOptionPane.showMessageDialog(null, "E-mail inválido!");
-                return false;
-            }
+        // Telefone
+        if (dto.getTelefone() != null
+                && !dto.getTelefone().isBlank()) {
+
+            doador.setTelefone(
+                    dto.getTelefone().trim()
+            );
+
+        } else {
+            doador.setTelefone(null);
         }
 
-        return true;
+        // E-mail em minúsculo
+        if (dto.getEmail() != null
+                && !dto.getEmail().isBlank()) {
+
+            doador.setEmail(
+                    dto.getEmail()
+                            .trim()
+                            .toLowerCase()
+            );
+
+        } else {
+            doador.setEmail(null);
+        }
     }
 
-    private void formatar(Doador doador) {
-        doador.setNome(doador.getNome().trim().toUpperCase());
+    // =========================
+    // VALIDAR CPF
+    // =========================
 
-        if (doador.getEndereco() != null && !doador.getEndereco().isBlank()) {
-            doador.setEndereco(doador.getEndereco().trim());
+    private void validarCpf(String cpf) {
+
+        if (cpf == null || cpf.isBlank()) {
+            return;
         }
 
-        if (doador.getTelefone() != null && !doador.getTelefone().isBlank()) {
-            doador.setTelefone(doador.getTelefone().trim());
-        }
+        String cpfLimpo =
+                cpf.replaceAll("[^0-9]", "");
 
-        if (doador.getEmail() != null && !doador.getEmail().isBlank()) {
-            doador.setEmail(doador.getEmail().trim().toLowerCase());
+        if (cpfLimpo.length() != 11) {
+
+            throw new IllegalArgumentException(
+                    "CPF inválido! Informe 11 dígitos."
+            );
         }
     }
 }

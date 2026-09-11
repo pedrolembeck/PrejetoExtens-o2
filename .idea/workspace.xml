@@ -5,25 +5,136 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="f60365a3-6403-4d82-842f-8dfaf9f74222" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/encodings.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/jarRepositories.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/application.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/doacoes/dao/DistribuicaoDAO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/doacoes/dao/DistribuicaoDAO.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/doacoes/model/Distribuicao.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/doacoes/model/Distribuicao.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/doacoes/model/Estoque.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/doacoes/model/Estoque.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/doacoes/App.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/doacoes/App.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/doacoes/connection/ConnectionFactory.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/doacoes/dao/DistribuicaoDAO.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/doacoes/dao/DoacaoDAO.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/doacoes/dao/DoadorDAO.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/doacoes/dao/EstoqueDAO.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/doacoes/dao/ItemDAO.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/doacoes/dao/ReceptorDAO.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/doacoes/dao/TamanhoRoupaDAO.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/doacoes/dao/TipoDoacaoDAO.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/doacoes/dao/UsuarioDAO.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/doacoes/enums/CategoriaItem.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/doacoes/model/Distribuicao.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/doacoes/model/Doacao.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/doacoes/model/Doador.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/doacoes/model/Estoque.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/doacoes/model/Item.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/doacoes/model/Receptor.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/doacoes/model/TamanhoRoupa.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/doacoes/model/TipoDoacao.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/doacoes/model/Usuario.java" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/doacoes/service/DistribuicaoService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/doacoes/service/DistribuicaoService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/doacoes/view/DistribuicaoView.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/doacoes/view/DistribuicaoView.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/doacoes/view/MenuView.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/doacoes/view/MenuView.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/doacoes/service/DoacaoService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/doacoes/service/DoacaoService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/doacoes/service/DoadorService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/doacoes/service/DoadorService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/doacoes/service/EstoqueService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/doacoes/service/EstoqueService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/doacoes/service/ItemService.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/doacoes/service/ReceptorService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/doacoes/service/ReceptorService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/doacoes/service/TamanhoRoupaService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/doacoes/service/TamanhoRoupaService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/doacoes/service/TipoDoacaoService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/doacoes/service/TipoDoacaoService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/doacoes/service/UsuarioService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/doacoes/service/UsuarioService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/doacoes/view/DistribuicaoView.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/doacoes/view/DoacaoView.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/doacoes/view/DoadorView.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/doacoes/view/EstoqueView.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/doacoes/view/ItemView.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/doacoes/view/LoginView.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/doacoes/view/MenuView.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/doacoes/view/ReceptorView.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/doacoes/view/TamanhoRoupaView.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/doacoes/view/TipoDoacaoView.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/doacoes/view/UsuarioView.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/hibernate.cfg.xml" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/target/classes/com/doacoes/App.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/doacoes/App.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/doacoes/dao/TipoDoacaoDAO.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/doacoes/dao/TipoDoacaoDAO.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/doacoes/model/TipoDoacao.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/doacoes/model/TipoDoacao.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/doacoes/connection/ConnectionFactory.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/doacoes/dao/DistribuicaoDAO.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/doacoes/dao/DoacaoDAO.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/doacoes/dao/DoadorDAO.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/doacoes/dao/EstoqueDAO.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/doacoes/dao/ReceptorDAO.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/doacoes/dao/TamanhoRoupaDAO.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/doacoes/dao/TipoDoacaoDAO.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/doacoes/dao/UsuarioDAO.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/doacoes/enums/CategoriaItem.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/doacoes/model/Distribuicao.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/doacoes/model/Doacao.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/doacoes/model/Doador.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/doacoes/model/Estoque.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/doacoes/model/Receptor.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/doacoes/model/TamanhoRoupa.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/doacoes/model/TipoDoacao.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/doacoes/model/Usuario.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/doacoes/service/DistribuicaoService.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/doacoes/service/DistribuicaoService.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/doacoes/service/DoacaoService.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/doacoes/service/DoacaoService.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/doacoes/service/DoadorService.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/doacoes/service/DoadorService.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/doacoes/service/EstoqueService.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/doacoes/service/EstoqueService.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/doacoes/service/ReceptorService.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/doacoes/service/ReceptorService.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/doacoes/service/TamanhoRoupaService.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/doacoes/service/TamanhoRoupaService.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/doacoes/service/TipoDoacaoService.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/doacoes/service/TipoDoacaoService.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/doacoes/service/UsuarioService.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/doacoes/service/UsuarioService.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/doacoes/view/DistribuicaoView.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/doacoes/view/DoacaoView$1.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/doacoes/view/DoacaoView$RoundedButton.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/doacoes/view/DoacaoView$RoundedPanel.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/doacoes/view/DoacaoView.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/doacoes/view/DoadorView$1.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/doacoes/view/DoadorView$RoundedButton.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/doacoes/view/DoadorView$RoundedPanel.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/doacoes/view/DoadorView.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/doacoes/view/EstoqueView$1.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/doacoes/view/EstoqueView$RoundedButton.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/doacoes/view/EstoqueView$RoundedPanel.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/doacoes/view/EstoqueView.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/doacoes/view/LoginView$1.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/doacoes/view/LoginView$BackgroundPanel.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/doacoes/view/LoginView$BrandPanel.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/doacoes/view/LoginView$RoundedButton.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/doacoes/view/LoginView$RoundedPanel.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/doacoes/view/LoginView.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/doacoes/view/MenuView$1.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/doacoes/view/MenuView.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/doacoes/view/ReceptorView$1.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/doacoes/view/ReceptorView$RoundedButton.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/doacoes/view/ReceptorView$RoundedPanel.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/doacoes/view/ReceptorView.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/doacoes/view/TamanhoRoupaView$1.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/doacoes/view/TamanhoRoupaView$RoundedButton.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/doacoes/view/TamanhoRoupaView$RoundedPanel.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/doacoes/view/TamanhoRoupaView.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/doacoes/view/TipoDoacaoView$1.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/doacoes/view/TipoDoacaoView$RoundedButton.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/doacoes/view/TipoDoacaoView$RoundedPanel.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/doacoes/view/TipoDoacaoView.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/doacoes/view/UsuarioView$1.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/doacoes/view/UsuarioView$RoundedButton.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/doacoes/view/UsuarioView$RoundedPanel.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/doacoes/view/UsuarioView.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/hibernate.cfg.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/maven-archiver/pom.properties" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/compile/default-compile/createdFiles.lst" beforeDir="false" afterPath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/compile/default-compile/createdFiles.lst" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/compile/default-compile/inputFiles.lst" beforeDir="false" afterPath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/compile/default-compile/inputFiles.lst" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/projeto-extensao-1.0-SNAPSHOT.jar" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Exception" />
+        <option value="Class" />
+        <option value="Interface" />
+      </list>
+    </option>
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -37,14 +148,76 @@
   <component name="GithubPullRequestsUISettings">{
   &quot;selectedUrlAndAccountId&quot;: {
     &quot;url&quot;: &quot;https://github.com/Lucktemberg/projeto_extensao_ll.git&quot;,
-    &quot;accountId&quot;: &quot;320ca7b3-163e-48eb-98a2-075823b52f27&quot;
+    &quot;accountId&quot;: &quot;8907363b-43cc-442b-b0ca-dd6f4ea59c5b&quot;
   }
 }</component>
+  <component name="NextEditCompletionFeaturesState">
+    <decayedCancelled>
+      <entry key="MS100" value="1.1292968440878767E-8" />
+      <entry key="MS500" value="0.025789621965175487" />
+      <entry key="S2" value="0.4856170710760281" />
+      <entry key="S5" value="1.066710080389994" />
+      <entry key="S10" value="1.4436729278475764" />
+      <entry key="S30" value="1.8446865484708546" />
+      <entry key="S60" value="3.3005176337296303" />
+      <entry key="M2" value="9.859658308536265" />
+      <entry key="M5" value="25.10500786160557" />
+      <entry key="M10" value="35.28894904757952" />
+      <entry key="M15" value="39.74656592912733" />
+      <entry key="M30" value="45.39543072990631" />
+      <entry key="H1" value="49.3058320136611" />
+      <entry key="H2" value="51.83750357039297" />
+      <entry key="H4" value="53.32371372846782" />
+      <entry key="D1" value="54.70575272135711" />
+      <entry key="W1" value="54.957576560043805" />
+    </decayedCancelled>
+    <decayedSelected>
+      <entry key="MS100" value="1.0" />
+      <entry key="MS500" value="1.0" />
+      <entry key="S2" value="1.0" />
+      <entry key="S5" value="1.000000000000043" />
+      <entry key="S10" value="1.000000244751503" />
+      <entry key="S30" value="1.0093447196199423" />
+      <entry key="S60" value="1.1355470335293176" />
+      <entry key="M2" value="1.5195399154017912" />
+      <entry key="M5" value="2.1658396277926366" />
+      <entry key="M10" value="2.5268507170071786" />
+      <entry key="M15" value="2.670574993498585" />
+      <entry key="M30" value="2.827863590659597" />
+      <entry key="H1" value="2.911990974923933" />
+      <entry key="H2" value="2.955499251586727" />
+      <entry key="H4" value="2.9776241604832228" />
+      <entry key="D1" value="2.996253147010152" />
+      <entry key="W1" value="2.999464303997004" />
+    </decayedSelected>
+    <decayedShown>
+      <entry key="MS100" value="6.18871752803123E-5" />
+      <entry key="MS500" value="0.1447187864707565" />
+      <entry key="S2" value="0.8579316570701848" />
+      <entry key="S5" value="1.6705154120769459" />
+      <entry key="S10" value="2.2056887203249476" />
+      <entry key="S30" value="2.762689684318622" />
+      <entry key="S60" value="4.382392953705233" />
+      <entry key="M2" value="11.341093035035437" />
+      <entry key="M5" value="27.247488478868675" />
+      <entry key="M10" value="37.80171566128037" />
+      <entry key="M15" value="42.407047631609395" />
+      <entry key="M30" value="48.21773531214111" />
+      <entry key="H1" value="52.214821744689225" />
+      <entry key="H2" value="54.79141958621303" />
+      <entry key="H4" value="56.300520271624514" />
+      <entry key="D1" value="57.701865400318" />
+      <entry key="W1" value="57.95702068559515" />
+    </decayedShown>
+  </component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 3,
   &quot;fromUser&quot;: false
 }</component>
   <component name="ProjectId" id="3FOqX41gQnX6nTjvdQWOrAQPkdW" />
+  <component name="ProjectLevelVcsManager">
+    <ConfirmationsSetting value="1" id="Add" />
+  </component>
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
@@ -54,16 +227,36 @@
     "Application.App.executor": "Run",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.git.unshallow": "true",
+    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
     "SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "git-widget-placeholder": "feature/doador-receptor",
+    "codeWithMe.voiceChat.enabledByDefault": "false",
+    "git-widget-placeholder": "sistema-spring-boot",
     "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "C:/Users/pedro/Desktop/Projeto extensão/projeto_extensao_ll"
+    "last_opened_file_path": "C:/Users/pedro/Desktop/Projeto extensão/projeto_extensao_ll",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.jshint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.jshint": "",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "settings.editor.selected.configurable": "MavenSettings"
   }
 }]]></component>
+  <component name="RunManager">
+    <configuration name="App" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+      <module name="projeto-extensao" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="com.doacoes.App" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+  </component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-jdk-30f59d01ecdd-2fc7cc6b9a17-intellij.indexing.shared.core-IU-253.32098.101" />
+        <option value="bundled-jdk-30f59d01ecdd-a203e0a19954-intellij.indexing.shared.core-IU-262.10315.125" />
+        <option value="bundled-js-predefined-d6986cc7102b-4abd2a77f808-JavaScript-IU-262.10315.125" />
       </set>
     </attachedChunks>
   </component>
@@ -76,5 +269,12 @@
       <updated>1781956499924</updated>
     </task>
     <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="XSLT-Support.FileAssociations.UIState">
+    <expand />
+    <select />
   </component>
 </project>

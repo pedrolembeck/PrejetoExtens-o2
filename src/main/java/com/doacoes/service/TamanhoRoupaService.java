@@ -1,81 +1,208 @@
 package com.doacoes.service;
 
-import com.doacoes.dao.TamanhoRoupaDAO;
-import com.doacoes.model.TamanhoRoupa;
+import com.doacoes.dto.TamanhoRoupaRequestDTO;
+import com.doacoes.entity.TamanhoRoupa;
+import com.doacoes.repository.TamanhoRoupaRepository;
+import jakarta.persistence.EntityNotFoundException;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import javax.swing.JOptionPane;
 import java.util.List;
+import java.util.Optional;
 
+@Service
 public class TamanhoRoupaService {
 
-    private final TamanhoRoupaDAO dao = new TamanhoRoupaDAO();
+    private final TamanhoRoupaRepository tamanhoRoupaRepository;
 
-    public void inicializar() {
-        dao.criarTabela();
+    public TamanhoRoupaService(
+            TamanhoRoupaRepository tamanhoRoupaRepository) {
+
+        this.tamanhoRoupaRepository =
+                tamanhoRoupaRepository;
     }
 
-    public boolean salvar(TamanhoRoupa tamanhoRoupa) {
-        if (!validar(tamanhoRoupa)) {
-            return false;
-        }
+    // =====================================================
+    // CREATE
+    // =====================================================
 
-        formatar(tamanhoRoupa);
+    @Transactional
+    public TamanhoRoupa salvar(
+            TamanhoRoupaRequestDTO dto) {
 
-        try {
-            dao.salvar(tamanhoRoupa);
-            return true;
-        } catch (RuntimeException e) {
-            JOptionPane.showMessageDialog(null,
-                    "Não foi possível salvar. Verifique se esse tamanho já existe para esse tipo.");
-            return false;
-        }
+        String tamanho =
+                formatar(dto.getTamanho());
+
+        String tipo =
+                formatar(dto.getTipo());
+
+        verificarDuplicidade(
+                tamanho,
+                tipo,
+                null
+        );
+
+        TamanhoRoupa tamanhoRoupa =
+                new TamanhoRoupa();
+
+        tamanhoRoupa.setTamanho(
+                tamanho
+        );
+
+        tamanhoRoupa.setTipo(
+                tipo
+        );
+
+        return tamanhoRoupaRepository.save(
+                tamanhoRoupa
+        );
     }
+
+    // =====================================================
+    // READ - LISTAR
+    // =====================================================
 
     public List<TamanhoRoupa> listar() {
-        return dao.listar();
+
+        return tamanhoRoupaRepository
+                .findAll();
     }
 
-    public TamanhoRoupa buscarPorId(Long id) {
-        return dao.buscarPorId(id);
+    // =====================================================
+    // READ - BUSCAR POR ID
+    // =====================================================
+
+    public TamanhoRoupa buscarPorId(
+            Long id) {
+
+        return tamanhoRoupaRepository
+                .findById(id)
+                .orElseThrow(() ->
+                        new EntityNotFoundException(
+                                "Tamanho de roupa não encontrado"
+                        )
+                );
     }
 
-    public boolean atualizar(TamanhoRoupa tamanhoRoupa) {
-        if (!validar(tamanhoRoupa)) {
-            return false;
-        }
+    // =====================================================
+    // UPDATE
+    // =====================================================
 
-        formatar(tamanhoRoupa);
+    @Transactional
+    public TamanhoRoupa atualizar(
+            Long id,
+            TamanhoRoupaRequestDTO dto) {
 
-        try {
-            dao.atualizar(tamanhoRoupa);
-            return true;
-        } catch (RuntimeException e) {
-            JOptionPane.showMessageDialog(null,
-                    "Não foi possível atualizar. Verifique se esse tamanho já existe para esse tipo.");
-            return false;
-        }
+        TamanhoRoupa tamanhoRoupa =
+                buscarPorId(id);
+
+        String tamanho =
+                formatar(dto.getTamanho());
+
+        String tipo =
+                formatar(dto.getTipo());
+
+        /*
+         * Verifica se existe outro registro
+         * com o mesmo tamanho e tipo.
+         */
+        verificarDuplicidade(
+                tamanho,
+                tipo,
+                id
+        );
+
+        tamanhoRoupa.setTamanho(
+                tamanho
+        );
+
+        tamanhoRoupa.setTipo(
+                tipo
+        );
+
+        return tamanhoRoupaRepository.save(
+                tamanhoRoupa
+        );
     }
 
+    // =====================================================
+    // DELETE
+    // =====================================================
+
+    @Transactional
     public void deletar(Long id) {
-        dao.deletar(id);
+
+        TamanhoRoupa tamanhoRoupa =
+                buscarPorId(id);
+
+        tamanhoRoupaRepository.delete(
+                tamanhoRoupa
+        );
     }
 
-    private boolean validar(TamanhoRoupa tamanhoRoupa) {
-        if (tamanhoRoupa.getTamanho() == null || tamanhoRoupa.getTamanho().isBlank()) {
-            JOptionPane.showMessageDialog(null, "Tamanho é obrigatório!");
-            return false;
+    // =====================================================
+    // VERIFICAR DUPLICIDADE
+    // =====================================================
+
+    private void verificarDuplicidade(
+            String tamanho,
+            String tipo,
+            Long idAtual) {
+
+        Optional<TamanhoRoupa> existente =
+                tamanhoRoupaRepository
+                        .findFirstByTamanhoIgnoreCaseAndTipoIgnoreCase(
+                                tamanho,
+                                tipo
+                        );
+
+        /*
+         * Nenhum registro encontrado.
+         */
+        if (existente.isEmpty()) {
+            return;
         }
 
-        if (tamanhoRoupa.getTipo() == null || tamanhoRoupa.getTipo().isBlank()) {
-            JOptionPane.showMessageDialog(null, "Tipo é obrigatório!");
-            return false;
+        /*
+         * CREATE
+         *
+         * Se idAtual for null e encontrou
+         * um registro, então já existe.
+         */
+        if (idAtual == null) {
+
+            throw new IllegalArgumentException(
+                    "Esse tamanho já existe para esse tipo"
+            );
         }
 
-        return true;
+        /*
+         * UPDATE
+         *
+         * Permite atualizar o próprio registro,
+         * mas não permite usar tamanho/tipo
+         * pertencente a outro registro.
+         */
+        if (!existente
+                .get()
+                .getId()
+                .equals(idAtual)) {
+
+            throw new IllegalArgumentException(
+                    "Esse tamanho já existe para esse tipo"
+            );
+        }
     }
 
-    private void formatar(TamanhoRoupa tamanhoRoupa) {
-        tamanhoRoupa.setTamanho(tamanhoRoupa.getTamanho().trim().toUpperCase());
-        tamanhoRoupa.setTipo(tamanhoRoupa.getTipo().trim().toUpperCase());
+    // =====================================================
+    // FORMATAR
+    // =====================================================
+
+    private String formatar(
+            String valor) {
+
+        return valor
+                .trim()
+                .toUpperCase();
     }
 }

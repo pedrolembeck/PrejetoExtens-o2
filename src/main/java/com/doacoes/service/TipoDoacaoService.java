@@ -1,90 +1,122 @@
-    package com.doacoes.service;
+package com.doacoes.service;
 
-    import com.doacoes.dao.TipoDoacaoDAO;
-    import com.doacoes.model.TipoDoacao;
+import com.doacoes.dto.TipoDoacaoRequestDTO;
+import com.doacoes.entity.TipoDoacao;
+import com.doacoes.repository.TipoDoacaoRepository;
+import jakarta.persistence.EntityNotFoundException;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-    import javax.swing.JOptionPane;
-    import java.util.List;
+import java.util.List;
 
-    public class TipoDoacaoService {
+@Service
+public class TipoDoacaoService {
 
-        private final TipoDoacaoDAO dao = new TipoDoacaoDAO();
+    private final TipoDoacaoRepository tipoDoacaoRepository;
 
-        public boolean salvar(TipoDoacao tipoDoacao) {
+    public TipoDoacaoService(
+            TipoDoacaoRepository tipoDoacaoRepository) {
 
+        this.tipoDoacaoRepository =
+                tipoDoacaoRepository;
+    }
 
-            if (tipoDoacao.getNome() == null || tipoDoacao.getNome().isBlank()) {
+    // =====================================================
+    // CREATE
+    // =====================================================
 
-                JOptionPane.showMessageDialog(
-                        null,
-                        "Nome inválido!"
+    @Transactional
+    public TipoDoacao salvar(
+            TipoDoacaoRequestDTO dto) {
+
+        TipoDoacao tipoDoacao =
+                new TipoDoacao();
+
+        preencherTipoDoacao(
+                tipoDoacao,
+                dto
+        );
+
+        return tipoDoacaoRepository.save(
+                tipoDoacao
+        );
+    }
+
+    // =====================================================
+    // READ - LISTAR
+    // =====================================================
+
+    public List<TipoDoacao> listar() {
+
+        return tipoDoacaoRepository
+                .findAll();
+    }
+
+    // =====================================================
+    // READ - BUSCAR POR ID
+    // =====================================================
+
+    public TipoDoacao buscarPorId(
+            Long id) {
+
+        return tipoDoacaoRepository
+                .findById(id)
+                .orElseThrow(() ->
+                        new EntityNotFoundException(
+                                "Tipo de doação não encontrado"
+                        )
                 );
+    }
 
-                return false;
-            }
+    // =====================================================
+    // UPDATE
+    // =====================================================
 
+    @Transactional
+    public TipoDoacao atualizar(
+            Long id,
+            TipoDoacaoRequestDTO dto) {
 
-            if (!tipoDoacao.getNome().matches("[a-zA-ZÀ-ÿ\\s]+")) {
+        TipoDoacao tipoDoacao =
+                buscarPorId(id);
 
-                JOptionPane.showMessageDialog(
-                        null,
-                        "O nome não pode conter números!"
-                );
+        preencherTipoDoacao(
+                tipoDoacao,
+                dto
+        );
 
-                return false;
-            }
+        return tipoDoacaoRepository.save(
+                tipoDoacao
+        );
+    }
 
-            dao.salvar(tipoDoacao);
+    // =====================================================
+    // DELETE
+    // =====================================================
 
-            return true;
-        }
+    @Transactional
+    public void deletar(Long id) {
 
-        public List<TipoDoacao> listar() {
-            return dao.listar();
+        TipoDoacao tipoDoacao =
+                buscarPorId(id);
 
-        }
+        tipoDoacaoRepository.delete(
+                tipoDoacao
+        );
+    }
 
-        public TipoDoacao buscarPorId(Long id) {
-            return dao.buscarPorId(id);
-        }
+    // =====================================================
+    // PREENCHER / FORMATAR
+    // =====================================================
 
-        public boolean atualizar(TipoDoacao tipoDoacao) {
-            if (tipoDoacao.getNome() == null || tipoDoacao.getNome().isBlank()) {
+    private void preencherTipoDoacao(
+            TipoDoacao tipoDoacao,
+            TipoDoacaoRequestDTO dto) {
 
-                JOptionPane.showMessageDialog(
-                        null,
-                        "Nome inválido!"
-                );
-
-                return false;
-            }
-
-
-            if (!tipoDoacao.getNome().matches("[a-zA-ZÀ-ÿ\\s]+")) {
-
-                JOptionPane.showMessageDialog(
-                        null,
-                        "O nome não pode conter números!"
-                );
-
-                return false;
-            }
-
-            dao.atualizar(tipoDoacao);
-
-            return true;
-        }
-
-
-
-
-        public void deletar(Long id) {
-            TipoDoacao tipo = dao.buscarPorId(id);
-
-            if (tipo == null) {
-                JOptionPane.showMessageDialog(null, "Tipo de doação não encontrado!");
-                return;
-            }
-
-            dao.deletar(id);
-        }}
+        tipoDoacao.setNome(
+                dto.getNome()
+                        .trim()
+                        .toUpperCase()
+        );
+    }
+}

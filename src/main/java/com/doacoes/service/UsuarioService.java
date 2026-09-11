@@ -1,157 +1,328 @@
 package com.doacoes.service;
 
-import com.doacoes.dao.UsuarioDAO;
-import com.doacoes.model.Usuario;
+import com.doacoes.dto.LoginRequestDTO;
+import com.doacoes.dto.UsuarioRequestDTO;
+import com.doacoes.entity.Usuario;
+import com.doacoes.repository.UsuarioRepository;
+import jakarta.persistence.EntityNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import javax.swing.JOptionPane;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
+@Service
 public class UsuarioService {
 
-    private final UsuarioDAO dao = new UsuarioDAO();
+    private final UsuarioRepository usuarioRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    public void inicializar() {
-        dao.criarTabela();
+    public UsuarioService(
+            UsuarioRepository usuarioRepository,
+            PasswordEncoder passwordEncoder) {
+
+        this.usuarioRepository =
+                usuarioRepository;
+
+        this.passwordEncoder =
+                passwordEncoder;
     }
 
-    public Usuario autenticar(String login, String senha) {
-        if (login == null || login.isBlank()) {
-            JOptionPane.showMessageDialog(null, "Informe o login!");
-            return null;
-        }
+    // =====================================================
+    // AUTENTICAR
+    // =====================================================
 
-        if (senha == null || senha.isBlank()) {
-            JOptionPane.showMessageDialog(null, "Informe a senha!");
-            return null;
-        }
+    public Usuario autenticar(
+            LoginRequestDTO dto) {
 
-        Usuario usuario = dao.buscarPorLoginESenha(login.trim(), senha.trim());
+        String login =
+                dto.getLogin().trim();
 
-        if (usuario == null) {
-            JOptionPane.showMessageDialog(null, "Usuário ou senha inválidos!");
-            return null;
+        String senha =
+                dto.getSenha().trim();
+
+        Usuario usuario =
+                usuarioRepository
+                        .findByLoginIgnoreCase(login)
+                        .orElseThrow(() ->
+                                new IllegalArgumentException(
+                                        "Usuário ou senha inválidos"
+                                )
+                        );
+
+        /*
+         * Compara a senha digitada
+         * com o hash BCrypt salvo no banco.
+         */
+        boolean senhaCorreta =
+                passwordEncoder.matches(
+                        senha,
+                        usuario.getSenha()
+                );
+
+        if (!senhaCorreta) {
+
+            throw new IllegalArgumentException(
+                    "Usuário ou senha inválidos"
+            );
         }
 
         return usuario;
     }
 
-    public boolean salvar(Usuario usuario) {
-        if (!validar(usuario)) {
-            return false;
-        }
+    // =====================================================
+    // CREATE
+    // =====================================================
 
-        prepararUsuarioParaSalvar(usuario);
+    @Transactional
+    public Usuario salvar(
+            UsuarioRequestDTO dto) {
 
-        try {
-            dao.salvar(usuario);
-            return true;
-        } catch (RuntimeException e) {
-            JOptionPane.showMessageDialog(
-                    null,
-                    "Erro ao salvar usuário. Verifique se o login já existe.",
-                    "Erro",
-                    JOptionPane.ERROR_MESSAGE
+        validarPerfil(
+                dto.getPerfil()
+        );
+
+        String login =
+                dto.getLogin().trim();
+
+        /*
+         * Login não pode ser repetido.
+         */
+        if (usuarioRepository
+                .existsByLoginIgnoreCase(login)) {
+
+            throw new IllegalArgumentException(
+                    "Já existe um usuário com esse login"
             );
-            return false;
         }
+
+        Usuario usuario =
+                new Usuario();
+
+        preencherUsuario(
+                usuario,
+                dto
+        );
+
+        return usuarioRepository.save(
+                usuario
+        );
     }
+
+    // =====================================================
+    // READ - LISTAR
+    // =====================================================
 
     public List<Usuario> listar() {
-        return dao.listar();
+
+        return usuarioRepository.findAll();
     }
 
-    public Usuario buscarPorId(Long id) {
+    // =====================================================
+    // READ - BUSCAR POR ID
+    // =====================================================
+
+    public Usuario buscarPorId(
+            Long id) {
+
         if (id == null) {
-            return null;
-        }
 
-        return dao.buscarPorId(id);
-    }
-
-    public boolean atualizar(Usuario usuario) {
-        if (!validar(usuario)) {
-            return false;
-        }
-
-        prepararUsuarioParaSalvar(usuario);
-
-        try {
-            dao.atualizar(usuario);
-            return true;
-        } catch (RuntimeException e) {
-            JOptionPane.showMessageDialog(
-                    null,
-                    "Erro ao atualizar usuário. Verifique se o login já existe.",
-                    "Erro",
-                    JOptionPane.ERROR_MESSAGE
+            throw new IllegalArgumentException(
+                    "ID do usuário é obrigatório"
             );
-            return false;
         }
+
+        return usuarioRepository
+                .findById(id)
+                .orElseThrow(() ->
+                        new EntityNotFoundException(
+                                "Usuário não encontrado"
+                        )
+                );
     }
 
+    // =====================================================
+    // UPDATE
+    // =====================================================
+
+    @Transactional
+    public Usuario atualizar(
+            Long id,
+            UsuarioRequestDTO dto) {
+
+        validarPerfil(
+                dto.getPerfil()
+        );
+
+        Usuario usuario =
+                buscarPorId(id);
+
+        String login =
+                dto.getLogin().trim();
+
+        /*
+         * Verifica se outro usuário
+         * já está usando esse login.
+         */
+        if (usuarioRepository
+                .existsByLoginIgnoreCaseAndIdNot(
+                        login,
+                        id
+                )) {
+
+            throw new IllegalArgumentException(
+                    "Já existe outro usuário com esse login"
+            );
+        }
+
+        preencherUsuario(
+                usuario,
+                dto
+        );
+
+        return usuarioRepository.save(
+                usuario
+        );
+    }
+
+    // =====================================================
+    // DELETE
+    // =====================================================
+
+    @Transactional
     public void deletar(Long id) {
-        if (id == null) {
-            JOptionPane.showMessageDialog(
-                    null,
-                    "Usuário inválido para exclusão.",
-                    "Atenção",
-                    JOptionPane.WARNING_MESSAGE
+
+        Usuario usuario =
+                buscarPorId(id);
+
+        usuarioRepository.delete(
+                usuario
+        );
+    }
+
+    // =====================================================
+    // PREENCHER / FORMATAR USUÁRIO
+    // =====================================================
+
+    private void preencherUsuario(
+            Usuario usuario,
+            UsuarioRequestDTO dto) {
+
+        /*
+         * Nome em maiúsculo.
+         */
+        usuario.setNome(
+                dto.getNome()
+                        .trim()
+                        .toUpperCase()
+        );
+
+        /*
+         * Login.
+         */
+        usuario.setLogin(
+                dto.getLogin()
+                        .trim()
+        );
+
+        /*
+         * Senha criptografada.
+         */
+        usuario.setSenha(
+                passwordEncoder.encode(
+                        dto.getSenha().trim()
+                )
+        );
+
+        /*
+         * Perfil em maiúsculo.
+         */
+        String perfil =
+                dto.getPerfil()
+                        .trim()
+                        .toUpperCase();
+
+        usuario.setPerfil(
+                perfil
+        );
+
+        /*
+         * Prepara as permissões.
+         */
+        List<String> permissoes =
+                prepararPermissoes(
+                        dto.getPermissoes()
+                );
+
+        /*
+         * Mantém a regra do código antigo:
+         *
+         * ADMIN não precisa possuir
+         * permissões individuais.
+         */
+        if ("ADMIN".equals(perfil)) {
+
+            permissoes.clear();
+        }
+
+        usuario.setPermissoes(
+                permissoes
+        );
+    }
+
+    // =====================================================
+    // PREPARAR PERMISSÕES
+    // =====================================================
+
+    private List<String> prepararPermissoes(
+            List<String> permissoes) {
+
+        if (permissoes == null) {
+            return new ArrayList<>();
+        }
+
+        return permissoes
+                .stream()
+                .filter(Objects::nonNull)
+                .map(String::trim)
+                .filter(permissao ->
+                        !permissao.isBlank()
+                )
+                .map(String::toUpperCase)
+                .distinct()
+                .toList();
+    }
+
+    // =====================================================
+    // VALIDAR PERFIL
+    // =====================================================
+
+    private void validarPerfil(
+            String perfil) {
+
+        if (perfil == null
+                || perfil.isBlank()) {
+
+            throw new IllegalArgumentException(
+                    "Perfil é obrigatório"
             );
-            return;
         }
 
-        dao.deletar(id);
-    }
+        String perfilFormatado =
+                perfil
+                        .trim()
+                        .toUpperCase();
 
-    private void prepararUsuarioParaSalvar(Usuario usuario) {
-        usuario.setNome(usuario.getNome().trim().toUpperCase());
-        usuario.setLogin(usuario.getLogin().trim());
-        usuario.setSenha(usuario.getSenha().trim());
-        usuario.setPerfil(usuario.getPerfil().trim().toUpperCase());
+        if (!"ADMIN".equals(perfilFormatado)
+                && !"USUARIO".equals(
+                perfilFormatado
+        )) {
 
-        if (usuario.getPermissoes() == null) {
-            usuario.setPermissoes(new ArrayList<>());
+            throw new IllegalArgumentException(
+                    "Perfil inválido. Use ADMIN ou USUARIO"
+            );
         }
-
-        if ("ADMIN".equalsIgnoreCase(usuario.getPerfil())) {
-            usuario.getPermissoes().clear();
-        }
-    }
-
-    private boolean validar(Usuario usuario) {
-        if (usuario == null) {
-            JOptionPane.showMessageDialog(null, "Usuário inválido!");
-            return false;
-        }
-
-        if (usuario.getNome() == null || usuario.getNome().isBlank()) {
-            JOptionPane.showMessageDialog(null, "Nome é obrigatório!");
-            return false;
-        }
-
-        if (usuario.getLogin() == null || usuario.getLogin().isBlank()) {
-            JOptionPane.showMessageDialog(null, "Login é obrigatório!");
-            return false;
-        }
-
-        if (usuario.getSenha() == null || usuario.getSenha().isBlank()) {
-            JOptionPane.showMessageDialog(null, "Senha é obrigatória!");
-            return false;
-        }
-
-        if (usuario.getPerfil() == null || usuario.getPerfil().isBlank()) {
-            JOptionPane.showMessageDialog(null, "Perfil é obrigatório!");
-            return false;
-        }
-
-        String perfil = usuario.getPerfil().trim().toUpperCase();
-
-        if (!"ADMIN".equals(perfil) && !"USUARIO".equals(perfil)) {
-            JOptionPane.showMessageDialog(null, "Perfil inválido!");
-            return false;
-        }
-
-        return true;
     }
 }

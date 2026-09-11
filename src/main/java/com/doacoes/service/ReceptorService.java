@@ -1,115 +1,247 @@
 package com.doacoes.service;
 
-import com.doacoes.dao.ReceptorDAO;
-import com.doacoes.model.Receptor;
+import com.doacoes.dto.ReceptorRequestDTO;
+import com.doacoes.entity.Receptor;
+import com.doacoes.repository.ReceptorRepository;
+import jakarta.persistence.EntityNotFoundException;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import javax.swing.JOptionPane;
 import java.util.List;
 
+@Service
 public class ReceptorService {
 
-    private final ReceptorDAO dao = new ReceptorDAO();
+    private final ReceptorRepository receptorRepository;
 
-    public void inicializar() {
-        dao.criarTabela();
+    public ReceptorService(
+            ReceptorRepository receptorRepository) {
+
+        this.receptorRepository = receptorRepository;
     }
 
-    public boolean salvar(Receptor receptor) {
-        if (!validar(receptor)) {
-            return false;
-        }
+    // =====================================================
+    // CREATE
+    // =====================================================
 
-        formatar(receptor);
+    @Transactional
+    public Receptor salvar(
+            ReceptorRequestDTO dto) {
 
-        try {
-            dao.salvar(receptor);
-            return true;
-        } catch (RuntimeException e) {
-            JOptionPane.showMessageDialog(null, "Erro ao salvar receptor. Verifique os dados informados.");
-            return false;
-        }
+        validarCpf(dto.getCpf());
+
+        Receptor receptor =
+                new Receptor();
+
+        preencherReceptor(
+                receptor,
+                dto
+        );
+
+        return receptorRepository.save(
+                receptor
+        );
     }
+
+    // =====================================================
+    // READ - LISTAR
+    // =====================================================
 
     public List<Receptor> listar() {
-        return dao.listar();
+
+        return receptorRepository.findAll();
     }
+
+    // =====================================================
+    // READ - BUSCAR POR ID
+    // =====================================================
 
     public Receptor buscarPorId(Long id) {
-        return dao.buscarPorId(id);
+
+        return receptorRepository
+                .findById(id)
+                .orElseThrow(() ->
+                        new EntityNotFoundException(
+                                "Receptor não encontrado"
+                        )
+                );
     }
 
-    public boolean atualizar(Receptor receptor) {
-        if (!validar(receptor)) {
-            return false;
-        }
+    // =====================================================
+    // UPDATE
+    // =====================================================
 
-        formatar(receptor);
+    @Transactional
+    public Receptor atualizar(
+            Long id,
+            ReceptorRequestDTO dto) {
 
-        try {
-            dao.atualizar(receptor);
-            return true;
-        } catch (RuntimeException e) {
-            JOptionPane.showMessageDialog(null, "Erro ao atualizar receptor. Verifique os dados informados.");
-            return false;
-        }
+        validarCpf(dto.getCpf());
+
+        Receptor receptor =
+                buscarPorId(id);
+
+        preencherReceptor(
+                receptor,
+                dto
+        );
+
+        return receptorRepository.save(
+                receptor
+        );
     }
 
+    // =====================================================
+    // DELETE
+    // =====================================================
+
+    @Transactional
     public void deletar(Long id) {
-        Receptor receptor = dao.buscarPorId(id);
 
-        if (receptor == null) {
-            JOptionPane.showMessageDialog(null, "Receptor não encontrado!");
-            return;
-        }
+        Receptor receptor =
+                buscarPorId(id);
 
-        dao.deletar(id);
+        receptorRepository.delete(
+                receptor
+        );
     }
 
-    public List<Receptor> pesquisar(String termo) {
-        if (termo == null || termo.isBlank()) {
+    // =====================================================
+    // PESQUISAR
+    // =====================================================
+
+    public List<Receptor> pesquisar(
+            String termo) {
+
+        if (termo == null
+                || termo.isBlank()) {
+
             return listar();
         }
 
-        return dao.pesquisar(termo.trim());
+        return receptorRepository
+                .pesquisar(
+                        termo.trim()
+                );
     }
 
-    private boolean validar(Receptor receptor) {
-        if (receptor.getNome() == null || receptor.getNome().isBlank()) {
-            JOptionPane.showMessageDialog(null, "Nome é obrigatório!");
-            return false;
+    // =====================================================
+    // PREENCHER / FORMATAR
+    // =====================================================
+
+    private void preencherReceptor(
+            Receptor receptor,
+            ReceptorRequestDTO dto) {
+
+        /*
+         * Nome em letras maiúsculas
+         */
+        receptor.setNome(
+                dto.getNome()
+                        .trim()
+                        .toUpperCase()
+        );
+
+        /*
+         * CPF
+         */
+        if (dto.getCpf() != null
+                && !dto.getCpf().isBlank()) {
+
+            receptor.setCpf(
+                    dto.getCpf().trim()
+            );
+
+        } else {
+
+            receptor.setCpf(null);
         }
 
-        if (receptor.getCpf() != null && !receptor.getCpf().isBlank()) {
-            String cpfLimpo = receptor.getCpf().replaceAll("[^0-9]", "");
-            if (cpfLimpo.length() != 11) {
-                JOptionPane.showMessageDialog(null, "CPF inválido! Informe 11 dígitos.");
-                return false;
-            }
+        /*
+         * Endereço
+         */
+        if (dto.getEndereco() != null
+                && !dto.getEndereco().isBlank()) {
+
+            receptor.setEndereco(
+                    dto.getEndereco().trim()
+            );
+
+        } else {
+
+            receptor.setEndereco(null);
         }
 
-        if (receptor.getEmail() != null && !receptor.getEmail().isBlank()) {
-            if (!receptor.getEmail().contains("@")) {
-                JOptionPane.showMessageDialog(null, "E-mail inválido!");
-                return false;
-            }
+        /*
+         * Telefone
+         */
+        if (dto.getTelefone() != null
+                && !dto.getTelefone().isBlank()) {
+
+            receptor.setTelefone(
+                    dto.getTelefone().trim()
+            );
+
+        } else {
+
+            receptor.setTelefone(null);
         }
 
-        return true;
+        /*
+         * E-mail em letras minúsculas
+         */
+        if (dto.getEmail() != null
+                && !dto.getEmail().isBlank()) {
+
+            receptor.setEmail(
+                    dto.getEmail()
+                            .trim()
+                            .toLowerCase()
+            );
+
+        } else {
+
+            receptor.setEmail(null);
+        }
     }
 
-    private void formatar(Receptor receptor) {
-        receptor.setNome(receptor.getNome().trim().toUpperCase());
+    // =====================================================
+    // VALIDAR CPF
+    // =====================================================
 
-        if (receptor.getEndereco() != null && !receptor.getEndereco().isBlank()) {
-            receptor.setEndereco(receptor.getEndereco().trim());
+    private void validarCpf(String cpf) {
+
+        /*
+         * CPF não é obrigatório.
+         */
+        if (cpf == null
+                || cpf.isBlank()) {
+
+            return;
         }
 
-        if (receptor.getTelefone() != null && !receptor.getTelefone().isBlank()) {
-            receptor.setTelefone(receptor.getTelefone().trim());
-        }
+        /*
+         * Remove pontos, traços etc.
+         *
+         * Exemplo:
+         *
+         * 123.456.789-00
+         *
+         * vira:
+         *
+         * 12345678900
+         */
+        String cpfLimpo =
+                cpf.replaceAll(
+                        "[^0-9]",
+                        ""
+                );
 
-        if (receptor.getEmail() != null && !receptor.getEmail().isBlank()) {
-            receptor.setEmail(receptor.getEmail().trim().toLowerCase());
+        if (cpfLimpo.length() != 11) {
+
+            throw new IllegalArgumentException(
+                    "CPF inválido! Informe 11 dígitos."
+            );
         }
     }
 }

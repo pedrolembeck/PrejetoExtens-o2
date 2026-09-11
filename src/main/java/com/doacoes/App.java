@@ -1,15 +1,12 @@
 package com.doacoes;
 
-import com.doacoes.view.LoginView;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-import javax.swing.SwingUtilities;
-
+@SpringBootApplication
 public class App {
 
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> {
-            LoginView loginView = new LoginView();
-            loginView.setVisible(true);
-        });
+        SpringApplication.run(App.class, args);
     }
 }
