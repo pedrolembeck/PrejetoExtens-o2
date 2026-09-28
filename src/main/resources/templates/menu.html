@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Solidário - Menu</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+
+<header class="topo">
+    <div>
+        <h1>SOLIDÁRIO</h1>
+        <p>Sistema de Gerenciamento de Doações</p>
+    </div>
+
+    <div class="usuario-logado">
+        <span id="nomeUsuario">Usuário</span>
+        <button onclick="sair()">Sair</button>
+    </div>
+</header>
+
+<main class="conteudo">
+    <h2>Selecione um módulo para continuar</h2>
+    <p class="descricao">Acesso liberado conforme permissões definidas pelo administrador.</p>
+
+    <div class="cards-menu">
+
+        <a href="/tela-usuarios" class="card card-escuro admin-only">
+            <h3>Usuários</h3>
+            <p>Gerenciar acessos ao sistema</p>
+        </a>
+
+        <a href="/tela-tipos-doacao" class="card card-azul">
+            <h3>Tipo de Doação</h3>
+            <p>Cadastrar e organizar tipos de itens</p>
+        </a>
+
+        <a href="/tela-tamanhos-roupa" class="card card-roxo">
+            <h3>Tamanhos</h3>
+            <p>Cadastrar tamanhos de roupas</p>
+        </a>
+
+        <a href="/tela-estoques" class="card card-verde">
+            <h3>Estoque</h3>
+            <p>Acompanhar itens disponíveis</p>
+        </a>
+
+        <a href="/tela-doadores" class="card card-roxo2">
+            <h3>Doador</h3>
+            <p>Gerenciar pessoas que realizam doações</p>
+        </a>
+
+        <a href="/tela-receptores" class="card card-laranja">
+            <h3>Receptor</h3>
+            <p>Gerenciar pessoas que recebem doações</p>
+        </a>
+
+        <a href="/tela-doacoes" class="card card-turquesa">
+            <h3>Doação</h3>
+            <p>Registrar novas doações recebidas</p>
+        </a>
+
+        <a href="/tela-distribuicoes" class="card card-vermelho">
+            <h3>Distribuição</h3>
+            <p>Controlar a entrega das doações</p>
+        </a>
+
+    </div>
+</main>
+
+<script>
+    const usuario = JSON.parse(localStorage.getItem("usuarioLogado"));
+
+    if (!usuario) {
+        window.location.href = "/login";
+    } else {
+        document.getElementById("nomeUsuario").innerText =
+            usuario.nome + " • " + usuario.perfil;
+
+        if (usuario.perfil !== "ADMIN") {
+            document.querySelectorAll(".admin-only").forEach(item => {
+                item.style.display = "none";
+            });
+        }
+    }
+
+    function sair() {
+        localStorage.removeItem("usuarioLogado");
+        window.location.href = "/login";
+    }
+</script>
+
+</body>
+</html>

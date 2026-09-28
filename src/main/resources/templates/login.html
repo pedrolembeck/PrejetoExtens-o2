@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Solidário - Login</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body class="login-body">
+
+<div class="login-container">
+
+    <div class="login-brand">
+        <div class="logo-circle">❤</div>
+        <h1>SOLIDÁRIO</h1>
+        <p>Sistema de Gestão de Doações</p>
+        <span>Organizando solidariedade,<br>conectando doações a quem mais precisa.</span>
+    </div>
+
+    <div class="login-card">
+        <h2>Acessar conta</h2>
+        <p>Informe suas credenciais para continuar</p>
+
+        <form onsubmit="entrar(event)">
+            <label>Login</label>
+            <input type="text" id="login" placeholder="Digite seu login" required>
+
+            <label>Senha</label>
+            <input type="password" id="senha" placeholder="Digite sua senha" required>
+
+            <button type="submit">Entrar no Sistema</button>
+        </form>
+
+        <div id="mensagem" class="mensagem-erro"></div>
+    </div>
+
+</div>
+
+<script>
+    function entrar(event) {
+        event.preventDefault();
+
+        const login = document.getElementById("login").value;
+        const senha = document.getElementById("senha").value;
+
+        fetch("/usuarios/autenticar", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                login: login,
+                senha: senha
+            })
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error("Login ou senha inválidos.");
+                }
+                return response.json();
+            })
+            .then(usuario => {
+                localStorage.setItem("usuarioLogado", JSON.stringify(usuario));
+                window.location.href = "/menu";
+            })
+            .catch(error => {
+                document.getElementById("mensagem").innerText = error.message;
+            });
+    }
+</script>
+
+</body>
+</html>

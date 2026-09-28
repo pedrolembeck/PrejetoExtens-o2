@@ -34,36 +34,35 @@ public class UsuarioService {
     // AUTENTICAR
     // =====================================================
 
-    public Usuario autenticar(
-            LoginRequestDTO dto) {
+    public Usuario autenticar(LoginRequestDTO dto) {
 
-        String login =
-                dto.getLogin().trim();
+        String login = dto.getLogin().trim();
+        String senha = dto.getSenha().trim();
 
-        String senha =
-                dto.getSenha().trim();
-
-        Usuario usuario =
-                usuarioRepository
-                        .findByLoginIgnoreCase(login)
-                        .orElseThrow(() ->
-                                new IllegalArgumentException(
-                                        "Usuário ou senha inválidos"
-                                )
-                        );
-
-        /*
-         * Compara a senha digitada
-         * com o hash BCrypt salvo no banco.
-         */
-        boolean senhaCorreta =
-                passwordEncoder.matches(
-                        senha,
-                        usuario.getSenha()
+        Usuario usuario = usuarioRepository
+                .findByLoginIgnoreCase(login)
+                .orElseThrow(() ->
+                        new IllegalArgumentException(
+                                "Usuário ou senha inválidos"
+                        )
                 );
 
-        if (!senhaCorreta) {
+        boolean senhaCorreta = passwordEncoder.matches(
+                senha,
+                usuario.getSenha()
+        );
 
+        if (!senhaCorreta && senha.equals(usuario.getSenha())) {
+            usuario.setSenha(
+                    passwordEncoder.encode(senha)
+            );
+
+            usuarioRepository.save(usuario);
+
+            senhaCorreta = true;
+        }
+
+        if (!senhaCorreta) {
             throw new IllegalArgumentException(
                     "Usuário ou senha inválidos"
             );
